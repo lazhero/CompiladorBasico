@@ -55,7 +55,7 @@ t_L_SQUARE_PAREN = r'\['
 t_R_SQUARE_PAREN = r'\]'
 t_UP_SCOPE=r'{'
 t_DOWN_SCOPE=r'}'
-#t_POW=r'\*\*'
+t_POW=r'\*\*'
 t_ignore  = ' \t'
 t_EOL=r';'
 t_INSTANCE=r'='
@@ -120,7 +120,7 @@ def t_error(t):
  # Build the lexer
 lexer = lex.lex()
 data = '''
-(2+2)
+Var=2;
 '''
 lexer.input(data)
 
@@ -129,45 +129,59 @@ lexer.input(data)
  
  # Tokenize
 while True:
-     tok = lexer.token()
-     if not tok: 
-         break      # No more input
-     print(tok.type,tok.value)
-
-def p_expression_plus(p):
-     'expression : expression PLUS term'
-     p[0] = p[1] + p[3]
- 
-def p_expression_minus(p):
-     'expression : expression MINUS term'
-     p[0] = p[1] - p[3]
- 
+    tok = lexer.token()
+    if not tok: 
+        break      # No more input 
+    print(tok.type,tok.value)
+def p_statement(p):
+    'statement : expression EOL'
+    p[0]=p[1]
+def p_expression_operation(p):
+    'expression : expression operations term'
+    p[0]=["BinaryOperation",p[2],p[1],p[3]]
 def p_expression_term(p):
-     'expression : term'
-     p[0] = p[1]
- 
-def p_term_times(p):
-     'term : term MULTIPLICATION factor'
-     p[0] = p[1] * p[3]
- 
-def p_term_div(p):
-     'term : term DIVIDE factor'
-     p[0] = p[1] / p[3]
- 
-def p_term_factor(p):
-     'term : factor'
-     p[0] = p[1]
- 
-def p_factor_num(p):
-     'factor : INTEGER'
-     p[0] = p[1]
- 
-def p_factor_expr(p):
-     'factor : L_PAREN expression R_PAREN'
-     p[0] = p[2]
- 
- # Error rule for syntax errors
+    'expression : term'
+    p[0]=p[1]
+def p_term_float(p):
+    'term : FLOAT'
+    p[0]=p[1]
+def p_term_integer(p):
+    'term : INTEGER'
+    p[0]=p[1]
+def p_term_identificator(p):
+    'term : IDENTIFIER'
+    p[0]=p[1]
+def p_term_expression(p):
+    'term : L_PAREN expression R_PAREN'
+    p[0]=p[2]
+
+def p_operations_addition(p):
+    'operations : PLUS'
+    p[0]=p[1]
+def p_operations_substraction(p):
+    'operations : MINUS'
+    p[0]=p[1]
+def p_operations_leftover(p):
+    'operations : LEFTOVER'
+    p[0]=p[1]
+def p_operations_division(p):
+    'operations : DIVIDE'
+    p[0]=p[1]
+def p_operations_division_integer(p):
+    'operations : INT_DIVISION'
+    p[0]=p[1]
+def p_operations_multiplication(p):
+    'operations : MULTIPLICATION'
+    p[0]=p[1]
+def p_operations_pow(p):
+    'operations : POW'
+    p[0]=p[1]
+def p_expresions_comparator(p):
+    'expression : expression COMPARATOR term'
+    p[0]=["BinaryComparator",p[2],p[1],p[3]]
+
 def p_error(p):
+
     print(p)
     print("Syntax error in input!")
  
