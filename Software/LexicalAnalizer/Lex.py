@@ -21,7 +21,7 @@ tokens = [
     'DIVIDE',
     'LEFTOVER',
     'INT_DIVISION',
-    'OPERATOR',
+    #'OPERATOR',
     'COMPARATOR',
     'L_PAREN',
     'R_PAREN',
@@ -84,9 +84,11 @@ comparator=r'('+equals+r'|'+lower+r'|'+lower_or_equal+r'|'+higher+r'|'+higher_or
 @lex.Token(comparator)
 def t_COMPARATOR(t):
     return t
+'''
 @lex.Token(floatnumber)
 def t_OPERATOR(t):
     return t
+'''
 @lex.Token(boolean)
 def t_BOOLEAN(t):
     return t
@@ -136,8 +138,11 @@ while True:
 def p_statement(p):
     'statement : expression EOL'
     p[0]=p[1]
-
-
+'''
+def p_statement_assign(p):
+    'statement : IDENTIFIER INSTANCE expression EOL'
+    p[0]=["ASSIGMENT",p[1],p[3]]
+'''
 def p_expression_plus(p):
      'expression : expression PLUS term'
      p[0] = p[1] + p[3]
