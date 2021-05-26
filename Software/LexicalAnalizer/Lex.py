@@ -21,7 +21,7 @@ tokens = [
     'DIVIDE',
     'LEFTOVER',
     'INT_DIVISION',
-    'OPERATOR',
+    #'OPERATOR',
     'COMPARATOR',
     'L_PAREN',
     'R_PAREN',
@@ -84,9 +84,11 @@ comparator=r'('+equals+r'|'+lower+r'|'+lower_or_equal+r'|'+higher+r'|'+higher_or
 @lex.Token(comparator)
 def t_COMPARATOR(t):
     return t
+'''
 @lex.Token(floatnumber)
 def t_OPERATOR(t):
     return t
+'''
 @lex.Token(boolean)
 def t_BOOLEAN(t):
     return t
@@ -109,7 +111,7 @@ def t_IDENTIFIER(t):
 def t_newline(t):
      r'\n+'
      t.lexer.lineno += len(t.value)
- 
+
 
  
  # Error handling rule
@@ -118,82 +120,131 @@ def t_error(t):
      t.lexer.skip(1)
  
  # Build the lexer
-lexer = lex.lex()
+
+
 data = '''
-Var=2;
+{var=12;var1=2**5;}
 '''
-lexer.input(data)
+lexer = lex.lex()
+#lexer.input(data)
 
 
 
  
  # Tokenize
+'''
 while True:
     tok = lexer.token()
     if not tok: 
         break      # No more input 
     print(tok.type,tok.value)
-def p_statement(p):
+'''
+def p_statement_scope(p):
+    'statement : scope'
+    p[0]=p[1]
+def p_statement_assign_math(p):
+    'statement : IDENTIFIER INSTANCE expression EOL'
+    p[0]=["ASSIGMENT",p[1],p[3]]
+def p_statement_assign_boolean(p):
+    'statement : IDENTIFIER INSTANCE BOOLEAN EOL'
+    p[0]=["ASSIGMENT",p[1],p[3]]
+def p_statement_expression(p):
     'statement : expression EOL'
     p[0]=p[1]
-def p_expression_operation(p):
-    'expression : expression operations term'
-    p[0]=["BinaryOperation",p[2],p[1],p[3]]
+def p_scope(p):
+    'scope : UP_SCOPE group DOWN_SCOPE'
+    p[0]=["Scope",p[2]]
+def p_group(p):
+    'group : nombre'
+    p[0]=p[1]
+def p_nombre_final(p):
+    'nombre : statement'
+    p[0]=p[1]
+def p_nombre_init(p):
+    'nombre : statement nombre'
+    p[0]=[p[1],p[2]]
+
+
+def p_expression_plus(p):
+     'expression : expression PLUS term'
+     p[0] = p[1] + p[3]
+ 
+def p_expression_minus(p):
+    'expression : expression MINUS term'
+    p[0] = p[1] - p[3]
+
 def p_expression_term(p):
     'expression : term'
-    p[0]=p[1]
-def p_term_float(p):
-    'term : FLOAT'
-    p[0]=p[1]
-def p_term_integer(p):
-    'term : INTEGER'
-    p[0]=p[1]
-def p_term_identificator(p):
-    'term : IDENTIFIER'
-    p[0]=p[1]
-def p_term_expression(p):
-    'term : L_PAREN expression R_PAREN'
-    p[0]=p[2]
+    p[0] = p[1]
 
-def p_operations_addition(p):
-    'operations : PLUS'
-    p[0]=p[1]
-def p_operations_substraction(p):
-    'operations : MINUS'
-    p[0]=p[1]
-def p_operations_leftover(p):
-    'operations : LEFTOVER'
-    p[0]=p[1]
-def p_operations_division(p):
-    'operations : DIVIDE'
-    p[0]=p[1]
-def p_operations_division_integer(p):
-    'operations : INT_DIVISION'
-    p[0]=p[1]
-def p_operations_multiplication(p):
-    'operations : MULTIPLICATION'
-    p[0]=p[1]
-def p_operations_pow(p):
-    'operations : POW'
-    p[0]=p[1]
-def p_expresions_comparator(p):
-    'expression : expression COMPARATOR term'
-    p[0]=["BinaryComparator",p[2],p[1],p[3]]
+def p_term_times(p):
+    'term : term MULTIPLICATION term2'
+    p[0] = p[1] * p[3]
+def p_term_leftover(p):
+    'term : term LEFTOVER term2'
+    p[0]=p[1]%p[3]
+def p_term_div(p):
+    'term : term DIVIDE term2'
+    p[0] = p[1] / p[3]
 
+def p_term_factor(p):
+    'term : factor'
+    p[0] = p[1]
+
+def p_factor_integer(p):
+    'factor : INTEGER'
+    p[0] = p[1]
+
+def p_factor_float(p):
+    'factor : FLOAT'
+    p[0] = p[1]
+def p_factor_expr(p):
+    'factor : L_PAREN expression R_PAREN'
+    p[0] = p[2]
+def p_term_term2(p):
+    'term : term2'
+    p[0]=p[1]
+def p_term2_pow(p):
+    'term2 : term2 POW factor2'
+    p[0]=p[1]**p[3]
+def p_term2_integer_division(p):
+    'term2 : term2 INT_DIVISION factor2'
+    p[0]=p[1]//p[3]
+def p_term2_factor2(p):
+    'term2 : factor2'
+    p[0] = p[1]
+def p_factor2_integer(p):
+    'factor2 : INTEGER'
+    p[0] = p[1]
+
+def p_factor2_float(p):
+    'factor2 : FLOAT'
+    p[0] = p[1]
+def p_factor2_expr(p):
+    'factor2 : L_PAREN expression R_PAREN'
+    p[0] = p[2]
+
+def p_term2_factor(p):
+    'term2 : factor'
+    p[0]=p[1]
+# Error rule for syntax errors
 def p_error(p):
-
     print(p)
     print("Syntax error in input!")
+
  
  # Build the parser
+
 parser = yacc.yacc()
-
-
 while True:
     try:
-        s = input('calc > ')
+        file=open("fuente.pn",'r')
+        #s =file.read()
+        #s="{var=12;var1=2**5;}"
+        s=input('calc> ')
+        print(s)
     except EOFError:
         break
     if not s: continue
-    result = parser.parse(s)
+    result = parser.parse(s,lexer=lexer)
     print(result)
