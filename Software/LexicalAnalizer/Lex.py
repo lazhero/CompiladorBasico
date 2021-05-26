@@ -111,7 +111,7 @@ def t_IDENTIFIER(t):
 def t_newline(t):
      r'\n+'
      t.lexer.lineno += len(t.value)
- 
+
 
  
  # Error handling rule
@@ -120,29 +120,51 @@ def t_error(t):
      t.lexer.skip(1)
  
  # Build the lexer
-lexer = lex.lex()
+
+
 data = '''
-Var=2;
+{var=12;var1=2**5;}
 '''
-lexer.input(data)
+lexer = lex.lex()
+#lexer.input(data)
 
 
 
  
  # Tokenize
+'''
 while True:
     tok = lexer.token()
     if not tok: 
         break      # No more input 
     print(tok.type,tok.value)
-def p_statement(p):
-    'statement : expression EOL'
-    p[0]=p[1]
 '''
-def p_statement_assign(p):
+def p_statement_scope(p):
+    'statement : scope'
+    p[0]=p[1]
+def p_statement_assign_math(p):
     'statement : IDENTIFIER INSTANCE expression EOL'
     p[0]=["ASSIGMENT",p[1],p[3]]
-'''
+def p_statement_assign_boolean(p):
+    'statement : IDENTIFIER INSTANCE BOOLEAN EOL'
+    p[0]=["ASSIGMENT",p[1],p[3]]
+def p_statement_expression(p):
+    'statement : expression EOL'
+    p[0]=p[1]
+def p_scope(p):
+    'scope : UP_SCOPE group DOWN_SCOPE'
+    p[0]=["Scope",p[2]]
+def p_group(p):
+    'group : nombre'
+    p[0]=p[1]
+def p_nombre_final(p):
+    'nombre : statement'
+    p[0]=p[1]
+def p_nombre_init(p):
+    'nombre : statement nombre'
+    p[0]=[p[1],p[2]]
+
+
 def p_expression_plus(p):
      'expression : expression PLUS term'
      p[0] = p[1] + p[3]
@@ -158,7 +180,9 @@ def p_expression_term(p):
 def p_term_times(p):
     'term : term MULTIPLICATION term2'
     p[0] = p[1] * p[3]
-
+def p_term_leftover(p):
+    'term : term LEFTOVER term2'
+    p[0]=p[1]%p[3]
 def p_term_div(p):
     'term : term DIVIDE term2'
     p[0] = p[1] / p[3]
@@ -205,16 +229,22 @@ def p_term2_factor(p):
     p[0]=p[1]
 # Error rule for syntax errors
 def p_error(p):
+    print(p)
     print("Syntax error in input!")
 
  
  # Build the parser
+
 parser = yacc.yacc()
 while True:
     try:
-        s = input('calc > ')
+        file=open("fuente.pn",'r')
+        #s =file.read()
+        #s="{var=12;var1=2**5;}"
+        s=input('calc> ')
+        print(s)
     except EOFError:
         break
     if not s: continue
-    result = parser.parse(s)
+    result = parser.parse(s,lexer=lexer)
     print(result)
