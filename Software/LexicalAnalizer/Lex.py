@@ -21,7 +21,6 @@ tokens = [
     'DIVIDE',
     'LEFTOVER',
     'INT_DIVISION',
-    #'OPERATOR',
     'COMPARATOR',
     'L_PAREN',
     'R_PAREN',
@@ -39,6 +38,8 @@ reserved = {
     'if' : 'IF',
     'else' : 'ELSE',
     'for' : 'FOR',
+    'in' : 'IN',
+    'Step' : 'STEP',
  }
 tokens=list(reserved.values())+tokens
 
@@ -142,6 +143,48 @@ while True:
 def p_statement_scope(p):
     'statement : scope'
     p[0]=p[1]
+
+def p_statement_conditional(p):
+    'statement : IF conditional scope'
+    p[0]=[p[1],p[2],p[3]]
+
+def p_statement_conditional_else(p):
+    'statement : IF conditional scope ELSE scope'
+    p[0]=["IF",p[2],p[3],p[4],p[5]]
+
+def p_conditional(p):
+    'conditional : IDENTIFIER COMPARATOR noiterable'
+    p[0]= ["CONDITIONAL",p[2], p[1], p[3]]
+
+def p_noiterable_integer(p):
+    'noiterable : INTEGER'
+    p[0]=p[1]
+
+def p_noiterable_float(p):
+    'noiterable : FLOAT'
+    p[0]=p[1]
+
+def p_noiterable_boolean(p):
+    'noiterable : BOOLEAN'
+    p[0]=p[1]
+
+def p_statement_iteracionstep(p):
+    'statement : FOR IDENTIFIER IN iterable STEP INTEGER scope'
+    p[0]=["FOR",p[2],"IN",p[4],"STEP",p[6],p[7]]
+
+def p_statement_iteracion(p):
+    'statement : FOR IDENTIFIER IN iterable scope'
+    p[0]=["FOR",p[2],"IN",p[4],"STEP",1,p[5]]
+
+
+def p_iterable_integer(p):
+    'iterable : INTEGER'
+    p[0]=p[1]
+
+def p_iterable_identifier(p):
+    'iterable : IDENTIFIER'
+    p[0]=p[1]
+
 def p_statement_assign_math(p):
     'statement : IDENTIFIER INSTANCE expression EOL'
     p[0]=["ASSIGMENT",p[1],p[3]]
@@ -238,7 +281,7 @@ def p_error(p):
 parser = yacc.yacc()
 while True:
     try:
-        file=open("fuente.pn",'r')
+        #file=open("fuente.pn",'r')
         #s =file.read()
         #s="{var=12;var1=2**5;}"
         s=input('calc> ')
