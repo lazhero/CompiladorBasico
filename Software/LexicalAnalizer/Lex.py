@@ -31,7 +31,12 @@ tokens = [
     'IDENTIFIER',
     'COMMENT',
     'EOL',
-    'INSTANCE'
+    'INSTANCE',
+    'METHOD_CALL_POINT',
+    'COMA',
+    'RESERVED_FUNC',
+    'MAIN_FUNC',
+    'PROCEDURE'
    
 ]
 reserved = {
@@ -41,6 +46,23 @@ reserved = {
     'in' : 'IN',
     'Step' : 'STEP',
  }
+reserved_function_names={
+    'blink' : 'BLINK',
+    'delay': 'DELAY',
+    'printLed' : "PRINT_LED" ,
+    'printLedX' : 'PRINT_LED_X'
+}
+#.get = get()
+reserved_methods_names={
+    'F':'F_METHOD',
+    'T': 'T_METHOD',
+    'Neg' : 'NEG',
+    'Pene' :'PENE',
+    'shapeF' : 'SHAPE_F',
+    'shapeC' : 'SHAPE_C',
+    'insert' : 'INSERT',
+    'delete': 'DELETE',
+}
 tokens=list(reserved.values())+tokens
 
  # Regular expression rules for simple tokens
@@ -60,6 +82,8 @@ t_POW=r'\*\*'
 t_ignore  = ' \t'
 t_EOL=r';'
 t_INSTANCE=r'='
+t_METHOD_CALL_POINT=r'\.'
+t_COMA=r','
 
 #Some complex regex
 digit            = r'([0-9])'
@@ -90,6 +114,12 @@ def t_COMPARATOR(t):
 def t_OPERATOR(t):
     return t
 '''
+def t_MAIN_FUNC(t):
+    r'main'
+    return t
+def t_PROCEDURE(t):
+    r'Procedure'
+    return t
 @lex.Token(boolean)
 def t_BOOLEAN(t):
     return t
@@ -108,6 +138,10 @@ def t_COMMENT(t):
 @lex.TOKEN(identifier)
 def t_IDENTIFIER(t):
     t.type = reserved.get(t.value,'IDENTIFIER')    # Check for reserved words
+    Func = reserved_function_names.get(t.value,'IDENTIFIER') 
+    if(Func!='IDENTIFIER'):
+        t.type= 'RESERVED_FUNC'
+    
     return t
 def t_newline(t):
      r'\n+'
@@ -124,22 +158,47 @@ def t_error(t):
 
 
 data = '''
-{var=12;var1=2**5;}
+main
 '''
 lexer = lex.lex()
-#lexer.input(data)
+lexer.input(data)
 
 
 
  
  # Tokenize
-'''
+
 while True:
     tok = lexer.token()
     if not tok: 
         break      # No more input 
     print(tok.type,tok.value)
-'''
+#[[1,2,3],[4,5,6],[7,8,9]]
+# 1,2,3#4,5,6#7,8,9
+def p_func_custom(p):
+    'func : PROCEDURE IDENTIFIER Parameters scope'
+    p[0]=['Func',p[1],p[2],p[3]]
+def p_func_main(p):
+    'func : PROCEDURE MAIN_FUNC Parameters scope'
+    p[0]=['Func',p[1],p[2],p[3]]
+def p_Parameters(p):
+    'Parameters : L_PAREN Params R_PAREN'
+    p[0]=['Parameters',p[2]]
+def p_Parameters_void(p):
+    'Parameters : L_PAREN R_PAREN'
+    p[0]=['Parameters',[]]
+
+def p_Params_list(p):
+    'Params : Params COMA final_param'
+    p[0]=p[1]+[p[3]]
+def p_Params_element(p):
+    'Params : final_param'
+    p[0]=[p[1]]
+def p_final_param(p):
+    'final_param : iterable'
+    p[0]=p[1]
+
+
 def p_statement_scope(p):
     'statement : scope'
     p[0]=p[1]
