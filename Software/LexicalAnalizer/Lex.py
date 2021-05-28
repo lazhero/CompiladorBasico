@@ -35,8 +35,10 @@ tokens = [
     'METHOD_CALL_POINT',
     'COMA',
     'RESERVED_FUNC',
+    'RESERVED_METHOD',
     'MAIN_FUNC',
-    'PROCEDURE'
+    'PROCEDURE',
+    'COLON'
    
 ]
 reserved = {
@@ -50,14 +52,17 @@ reserved_function_names={
     'blink' : 'BLINK',
     'delay': 'DELAY',
     'printLed' : "PRINT_LED" ,
-    'printLedX' : 'PRINT_LED_X'
+    'printLedX' : 'PRINT_LED_X',
+    'range' : 'RANGE',
+    'list'  : 'LIST',
+    'type' : 'TYPE',
+    'len': 'LEN',
 }
 #.get = get()
 reserved_methods_names={
     'F':'F_METHOD',
     'T': 'T_METHOD',
     'Neg' : 'NEG',
-    'Pene' :'PENE',
     'shapeF' : 'SHAPE_F',
     'shapeC' : 'SHAPE_C',
     'insert' : 'INSERT',
@@ -84,6 +89,7 @@ t_EOL=r';'
 t_INSTANCE=r'='
 t_METHOD_CALL_POINT=r'\.'
 t_COMA=r','
+t_COLON=r':'
 
 #Some complex regex
 digit            = r'([0-9])'
@@ -134,14 +140,15 @@ def t_INTEGER(t):
 def t_COMMENT(t):
     r'\#\#.*'
     pass
-
 @lex.TOKEN(identifier)
 def t_IDENTIFIER(t):
     t.type = reserved.get(t.value,'IDENTIFIER')    # Check for reserved words
-    Func = reserved_function_names.get(t.value,'IDENTIFIER') 
+    Func = reserved_function_names.get(t.value,'IDENTIFIER')
+    Method=reserved_methods_names.get(t.value,'IDENTIFIER')
     if(Func!='IDENTIFIER'):
         t.type= 'RESERVED_FUNC'
-    
+    if(Method!='IDENTIFIER'):
+        t.type='RESERVED_METHOD'
     return t
 def t_newline(t):
      r'\n+'
@@ -160,120 +167,193 @@ def t_error(t):
 data = '''
 main
 '''
-lexer = lex.lex()
-lexer.input(data)
+mylexer = lex.lex()
+mylexer.input(data)
 
 
 
  
- # Tokenize
+
 
 while True:
-    tok = lexer.token()
+    tok = mylexer.token()
     if not tok: 
-        break      # No more input 
+        break 
     print(tok.type,tok.value)
-#[[1,2,3],[4,5,6],[7,8,9]]
-# 1,2,3#4,5,6#7,8,9
+
+
+
 def p_func_custom(p):
-    'func : PROCEDURE IDENTIFIER Parameters scope'
-    p[0]=['Func',p[1],p[2],p[3]]
+    'func : PROCEDURE IDENTIFIER Arguments scope'
+    p[0]=["PROCEDURE",p[2],p[3],p[4]]
 def p_func_main(p):
-    'func : PROCEDURE MAIN_FUNC Parameters scope'
-    p[0]=['Func',p[1],p[2],p[3]]
+    'func : PROCEDURE MAIN_FUNC Arguments scope'
+    p[0]=['MAIN_FUNC',p[1],p[2],p[3]]
+
+
+
+def p_Arguments(p):
+    'Arguments : L_PAREN args R_PAREN'
+    p[0]=['ARGUMENTS',p[2]]
+def p_Arguments_void(p):
+    'Arguments : L_PAREN R_PAREN'
+    p[0]=['ARGUMENTS',[]]
+def p_args_list(p):
+    'args : args COMA final_arg'
+    p[0]=p[1]+[p[3]]
+def p_args_element(p):
+    'args : final_arg'
+    p[0]=[p[1]]
+def p_final_arg(p):
+    'final_arg : iterable'
+    p[0]=p[1]
+
+
 def p_Parameters(p):
-    'Parameters : L_PAREN Params R_PAREN'
-    p[0]=['Parameters',p[2]]
+    'Parameters : L_PAREN params R_PAREN'
+    p[0]=['PARAMETERS',p[2]]
 def p_Parameters_void(p):
     'Parameters : L_PAREN R_PAREN'
-    p[0]=['Parameters',[]]
-
-def p_Params_list(p):
-    'Params : Params COMA final_param'
+    p[0]=['PARAMETERS',[]]
+def p_params_list(p):
+    'params : params COMA final_param'
     p[0]=p[1]+[p[3]]
-def p_Params_element(p):
-    'Params : final_param'
+def p_params_element(p):
+    'params : final_param'
     p[0]=[p[1]]
-def p_final_param(p):
+def p_final_param_iterable(p):
     'final_param : iterable'
     p[0]=p[1]
+def p_final_param_noiterable(p):
+    'final_param : noiterable'
+    p[0]=p[1]
+def p_final_param_list(p):
+    'final_param : list'
+    p[0]=p[1]
+
+
+
 
 
 def p_statement_scope(p):
     'statement : scope'
     p[0]=p[1]
-
 def p_statement_conditional(p):
     'statement : IF conditional scope'
     p[0]=[p[1],p[2],p[3]]
+def p_statement_functioncall(p):
+    'statement : functioncall EOL'
+    p[0]=p[1]
+def p_statement_methodcall(p):
+    'statement : methodcall EOL'
 
+def p_functioncall(p):
+    'functioncall : IDENTIFIER Parameters'
+    p[0] = ["CALL_FUNC",p[1],p[2]]
+def p_methodcall(p):
+    'methodcall : IDENTIFIER METHOD_CALL_POINT IDENTIFIER Parameters'
+    p[0] = ["METHOD_CALL",p[1],p[3],p[4]]
+def p_methodcall_list(p):
+    'methodcall : access_list METHOD_CALL_POINT IDENTIFIER Parameters'
+    p[0] = ["METHOD_CALL",p[1],p[3],p[4]]
 def p_statement_conditional_else(p):
     'statement : IF conditional scope ELSE scope'
     p[0]=["IF",p[2],p[3],p[4],p[5]]
-
 def p_conditional(p):
     'conditional : IDENTIFIER COMPARATOR noiterable'
     p[0]= ["CONDITIONAL",p[2], p[1], p[3]]
-
-def p_noiterable_integer(p):
-    'noiterable : INTEGER'
-    p[0]=p[1]
-
-def p_noiterable_float(p):
-    'noiterable : FLOAT'
-    p[0]=p[1]
-
-def p_noiterable_boolean(p):
-    'noiterable : BOOLEAN'
-    p[0]=p[1]
-
 def p_statement_iteracionstep(p):
     'statement : FOR IDENTIFIER IN iterable STEP INTEGER scope'
     p[0]=["FOR",p[2],"IN",p[4],"STEP",p[6],p[7]]
-
 def p_statement_iteracion(p):
     'statement : FOR IDENTIFIER IN iterable scope'
     p[0]=["FOR",p[2],"IN",p[4],"STEP",1,p[5]]
-
-
-def p_iterable_integer(p):
-    'iterable : INTEGER'
-    p[0]=p[1]
-
-def p_iterable_identifier(p):
-    'iterable : IDENTIFIER'
-    p[0]=p[1]
-
 def p_statement_assign_math(p):
     'statement : IDENTIFIER INSTANCE expression EOL'
+    p[0]=["ASSIGMENT",p[1],p[3]]
+def p_statement_assign_access_list(p):
+    'statement : IDENTIFIER INSTANCE access_list EOL'
     p[0]=["ASSIGMENT",p[1],p[3]]
 def p_statement_assign_boolean(p):
     'statement : IDENTIFIER INSTANCE BOOLEAN EOL'
     p[0]=["ASSIGMENT",p[1],p[3]]
+def p_statement_assign_boolean(p):
+    'statement : IDENTIFIER INSTANCE list EOL'
+    p[0]=["ASSIGMENT",p[1],p[3]]
+def p_statement_assing_method(p):
+    'statement : IDENTIFIER INSTANCE methodcall EOL'
+    p[0]=p[1]
 def p_statement_expression(p):
     'statement : expression EOL'
     p[0]=p[1]
+def p_statement_list_access(p):
+    'statement : access_list EOL'
+    p[0]=p[1]
+
+
 def p_scope(p):
     'scope : UP_SCOPE group DOWN_SCOPE'
-    p[0]=["Scope",p[2]]
+    p[0]=["SCOPE",p[2]]
 def p_group(p):
-    'group : nombre'
+    'group : Succesion_of_Statements'
     p[0]=p[1]
-def p_nombre_final(p):
-    'nombre : statement'
+def p_Succesion_of_Statements_final(p):
+    'Succesion_of_Statements : statement'
     p[0]=p[1]
-def p_nombre_init(p):
-    'nombre : statement nombre'
+def p_Succesion_of_Statements_init(p):
+    'Succesion_of_Statements : statement Succesion_of_Statements'
     p[0]=[p[1],p[2]]
 
 
+def p_list(p):
+    'list : L_SQUARE_PAREN params R_SQUARE_PAREN'
+    p[0]=["LIST",p[2]]
+def p_list_void(p):
+    'list : L_SQUARE_PAREN R_SQUARE_PAREN'
+    p[0]=["LIST",[]]
+def p_access_list(p):
+    'access_list : IDENTIFIER index_list recursive_index'
+    p[0]=["ACCESS",p[1]]+p[2]+p[3]
+
+def p_index_list(p):
+    'index_list : L_SQUARE_PAREN allowed_access_index R_SQUARE_PAREN'
+    p[0]=["SINGLE",p[2]]
+def p_index_list_range(p):
+    'index_list : L_SQUARE_PAREN allowed_access_index COLON allowed_access_index R_SQUARE_PAREN'
+    p[0]=["RANGE",p[2],p[4]]
+def p_index_list_range_start_no_defined(p):
+    'index_list : L_SQUARE_PAREN COLON COMA allowed_access_index R_SQUARE_PAREN'
+    p[0]=["RANGE","NODEFINED",p[4]]
+def p_index_list_range_end_no_defined(p):
+    'index_list : L_SQUARE_PAREN allowed_access_index COMA COLON R_SQUARE_PAREN'
+    p[0]=["RANGE",p[2],"NODEFINED"]
+def p_allowed_access_index_integer(p):
+    'allowed_access_index : INTEGER'
+    p[0]=p[1]
+def p_allowed_access_index_identifier(p):
+    'allowed_access_index : IDENTIFIER'
+    p[0]=p[1]
+def p_recursive_index(p):
+    'recursive_index : index_list recursive_index'
+    p[0]=p[1]+p[2]
+def p_recursive_index_void(p):
+    'recursive_index : '
+    p[0]=[]
+
+
+
+
+
+
+
+#Math managing
 def p_expression_plus(p):
      'expression : expression PLUS term'
-     p[0] = p[1] + p[3]
+     p[0]=[p[2],p[1],p[3]]
  
 def p_expression_minus(p):
     'expression : expression MINUS term'
-    p[0] = p[1] - p[3]
+    p[0]=[p[2],p[1],p[3]]
 
 def p_expression_term(p):
     'expression : term'
@@ -281,13 +361,13 @@ def p_expression_term(p):
 
 def p_term_times(p):
     'term : term MULTIPLICATION term2'
-    p[0] = p[1] * p[3]
+    p[0] = [p[2],p[1] , p[3]]
 def p_term_leftover(p):
     'term : term LEFTOVER term2'
-    p[0]=p[1]%p[3]
+    p[0]=[p[2],p[1],p[3]]
 def p_term_div(p):
     'term : term DIVIDE term2'
-    p[0] = p[1] / p[3]
+    p[0]=[p[2],p[1],p[3]]
 
 def p_term_factor(p):
     'term : factor'
@@ -300,6 +380,20 @@ def p_factor_integer(p):
 def p_factor_float(p):
     'factor : FLOAT'
     p[0] = p[1]
+
+def p_factor_function_call(p):
+    'factor : functioncall'
+    p[0]=p[1]
+def p_factor_method_call(p):
+    'factor : methodcall'
+    p[0]=p[1]
+def p_factor_list(p):
+    'factor : access_list'
+    p[0]=p[1]
+
+def p_factor_id(p):
+    'factor : IDENTIFIER'
+    p[0] = p[1]
 def p_factor_expr(p):
     'factor : L_PAREN expression R_PAREN'
     p[0] = p[2]
@@ -308,26 +402,60 @@ def p_term_term2(p):
     p[0]=p[1]
 def p_term2_pow(p):
     'term2 : term2 POW factor2'
-    p[0]=p[1]**p[3]
+    p[0]=[p[2],p[1],p[3]]
 def p_term2_integer_division(p):
     'term2 : term2 INT_DIVISION factor2'
-    p[0]=p[1]//p[3]
+    p[0]=[p[2],p[1],p[3]]
 def p_term2_factor2(p):
     'term2 : factor2'
     p[0] = p[1]
 def p_factor2_integer(p):
     'factor2 : INTEGER'
     p[0] = p[1]
-
 def p_factor2_float(p):
     'factor2 : FLOAT'
     p[0] = p[1]
+
+def p_factor2_function_call(p):
+    'factor2 : functioncall'
+    p[0]=p[1]
+def p_factor2_method_call(p):
+    'factor2 : methodcall'
+    p[0]=p[1]
+def p_factor2_list(p):
+    'factor2 : access_list'
+    p[0]=p[1]
+
 def p_factor2_expr(p):
     'factor2 : L_PAREN expression R_PAREN'
     p[0] = p[2]
+def p_factor2_id(p):
+    'factor2 : IDENTIFIER'
+    p[0] = p[1]
 
 def p_term2_factor(p):
     'term2 : factor'
+    p[0]=p[1]
+
+
+
+
+
+
+#iterables and noiterables 
+def p_iterable_identifier(p):
+    'iterable : IDENTIFIER'
+    p[0]=p[1]
+def p_noiterable_integer(p):
+    'noiterable : INTEGER'
+    p[0]=p[1]
+
+def p_noiterable_float(p):
+    'noiterable : FLOAT'
+    p[0]=p[1]
+
+def p_noiterable_boolean(p):
+    'noiterable : BOOLEAN'
     p[0]=p[1]
 # Error rule for syntax errors
 def p_error(p):
@@ -338,15 +466,12 @@ def p_error(p):
  # Build the parser
 
 parser = yacc.yacc()
-while True:
-    try:
-        #file=open("fuente.pn",'r')
-        #s =file.read()
-        #s="{var=12;var1=2**5;}"
-        s=input('calc> ')
-        print(s)
-    except EOFError:
-        break
-    if not s: continue
-    result = parser.parse(s,lexer=lexer)
-    print(result)
+
+   
+file=open("fuente.pn",'r')
+s =file.read()
+#s="{var=12;var1=2**5;}"
+#s=input('calc> ')
+#print(s)
+result = parser.parse(s,lexer=mylexer)
+print(result)
