@@ -250,11 +250,20 @@ def p_statement_methodcall(p):
 def p_functioncall(p):
     'functioncall : IDENTIFIER Parameters'
     p[0] = ["CALL_FUNC",p[1],p[2]]
+def p_functioncall_reserver(p):
+    'functioncall : RESERVED_FUNC Parameters'
+    p[0] = ["CALL_FUNC",p[1],p[2]]
 def p_methodcall(p):
     'methodcall : IDENTIFIER METHOD_CALL_POINT IDENTIFIER Parameters'
     p[0] = ["METHOD_CALL",p[1],p[3],p[4]]
 def p_methodcall_list(p):
     'methodcall : access_list METHOD_CALL_POINT IDENTIFIER Parameters'
+    p[0] = ["METHOD_CALL",p[1],p[3],p[4]]
+def p_methodcall_reserved(p):
+    'methodcall : IDENTIFIER METHOD_CALL_POINT RESERVED_METHOD Parameters'
+    p[0] = ["METHOD_CALL",p[1],p[3],p[4]]
+def p_methodcall_list_reserved(p):
+    'methodcall : access_list METHOD_CALL_POINT RESERVED_METHOD Parameters'
     p[0] = ["METHOD_CALL",p[1],p[3],p[4]]
 def p_statement_conditional_else(p):
     'statement : IF conditional scope ELSE scope'
@@ -332,6 +341,9 @@ def p_allowed_access_index_integer(p):
     p[0]=p[1]
 def p_allowed_access_index_identifier(p):
     'allowed_access_index : IDENTIFIER'
+    p[0]=p[1]
+def p_allowed_access_index_expression(p):
+    'allowed_access_index : expression'
     p[0]=p[1]
 def p_recursive_index(p):
     'recursive_index : index_list recursive_index'
