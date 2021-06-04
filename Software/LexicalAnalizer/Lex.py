@@ -4,10 +4,13 @@
  # tokenizer for a simple expression evaluator for
  # numbers and +,-,*,/
  # ------------------------------------------------------------
+
 from tokenize import Token
 import ply.lex as lex
 import ply.yacc as yacc
 from ply.ctokens import tokens
+from m_tree import *
+from TS import TS_FROM_m_tree as TSF
  
  # List of token names.   This is always required
 tokens = [
@@ -115,11 +118,6 @@ comparator=r'('+equals+r'|'+lower+r'|'+lower_or_equal+r'|'+higher+r'|'+higher_or
 @lex.Token(comparator)
 def t_COMPARATOR(t):
     return t
-'''
-@lex.Token(floatnumber)
-def t_OPERATOR(t):
-    return t
-'''
 def t_MAIN_FUNC(t):
     r'main'
     return t
@@ -151,8 +149,8 @@ def t_IDENTIFIER(t):
         t.type='RESERVED_METHOD'
     return t
 def t_newline(t):
-     r'\n+'
-     t.lexer.lineno += len(t.value)
+    r'\n+'
+    t.lexer.lineno += len(t.value)
 
 
  
@@ -160,32 +158,30 @@ def t_newline(t):
 def t_error(t):
      print("Illegal character '%s'" % t.value[0])
      t.lexer.skip(1)
+
  
  # Build the lexer
 
 
-data = '''
-main
+data = '''main
+pene
+caradura
+var=12;
 '''
-mylexer = lex.lex()
-mylexer.input(data)
 
-
-
- 
-
-
-while True:
-    tok = mylexer.token()
-    if not tok: 
-        break 
-    print(tok.type,tok.value)
-
-
-
+def p_program(p):
+    'program : fun_block'
+    p[0]=["PROGRAM",p[1]]
+def p_fun_block(p):
+    'fun_block : func'
+    p[0]=[p[1]]
+def p_fun_block_recursive(p):
+    'fun_block : func fun_block'
+    p[0]=[p[1]]+p[2]
 def p_func_custom(p):
     'func : PROCEDURE IDENTIFIER Arguments scope'
-    p[0]=["PROCEDURE",p[2],p[3],p[4]]
+    p[0]=["PROCEDURE",["IDENTIFIER",p[2]],p[3],p[4]]
+
 def p_func_main(p):
     'func : PROCEDURE MAIN_FUNC Arguments scope'
     p[0]=['MAIN_FUNC',p[1],p[2],p[3]]
@@ -230,7 +226,9 @@ def p_final_param_noiterable(p):
 def p_final_param_list(p):
     'final_param : list'
     p[0]=p[1]
-
+def p_final_param_expression(p):
+    'final_param : expression'
+    p[0]=p[1]
 
 
 
@@ -249,19 +247,19 @@ def p_statement_methodcall(p):
 
 def p_functioncall(p):
     'functioncall : IDENTIFIER Parameters'
-    p[0] = ["CALL_FUNC",p[1],p[2]]
+    p[0] = ["CALL_FUNC",["IDENTIFIER",p[1]],p[2]]
 def p_functioncall_reserver(p):
     'functioncall : RESERVED_FUNC Parameters'
     p[0] = ["CALL_FUNC",p[1],p[2]]
 def p_methodcall(p):
     'methodcall : IDENTIFIER METHOD_CALL_POINT IDENTIFIER Parameters'
-    p[0] = ["METHOD_CALL",p[1],p[3],p[4]]
+    p[0] = ["METHOD_CALL",["IDENTIFIER",p[1]],["IDENTIFIER",p[3]],p[4]]
 def p_methodcall_list(p):
     'methodcall : access_list METHOD_CALL_POINT IDENTIFIER Parameters'
-    p[0] = ["METHOD_CALL",p[1],p[3],p[4]]
+    p[0] = ["METHOD_CALL",p[1],["IDENTIFIER",p[3]],p[4]]
 def p_methodcall_reserved(p):
     'methodcall : IDENTIFIER METHOD_CALL_POINT RESERVED_METHOD Parameters'
-    p[0] = ["METHOD_CALL",p[1],p[3],p[4]]
+    p[0] = ["METHOD_CALL",["IDENTIFIER",p[1]],p[3],p[4]]
 def p_methodcall_list_reserved(p):
     'methodcall : access_list METHOD_CALL_POINT RESERVED_METHOD Parameters'
     p[0] = ["METHOD_CALL",p[1],p[3],p[4]]
@@ -270,28 +268,35 @@ def p_statement_conditional_else(p):
     p[0]=["IF",p[2],p[3],p[4],p[5]]
 def p_conditional(p):
     'conditional : IDENTIFIER COMPARATOR noiterable'
-    p[0]= ["CONDITIONAL",p[2], p[1], p[3]]
+    p[0]= ["CONDITIONAL",["COMPARATOR",p[2]], ["IDENTIFIER",p[1]], p[3]]
 def p_statement_iteracionstep(p):
     'statement : FOR IDENTIFIER IN iterable STEP INTEGER scope'
-    p[0]=["FOR",p[2],"IN",p[4],"STEP",p[6],p[7]]
+    p[0]=["FOR",["IDENTIFIER",p[2]],"IN",p[4],"STEP",["INTEGER",p[6]],p[7]]
+def p_statement_iteracion_step_integer(p):
+    'statement : FOR IDENTIFIER IN INTEGER STEP INTEGER scope'
+    p[0]=["FOR",["IDENTIFIER",p[2]],"IN",["INTEGER",p[4]],"STEP",p[6],p[7]]
 def p_statement_iteracion(p):
     'statement : FOR IDENTIFIER IN iterable scope'
-    p[0]=["FOR",p[2],"IN",p[4],"STEP",1,p[5]]
+    p[0]=["FOR",["IDENTIFIER",p[2]],"IN",p[4],"STEP",1,p[5]]
+def p_statement_iteracion_integer(p):
+    'statement : FOR IDENTIFIER IN INTEGER scope'
+    p[0]=["FOR",["IDENTIFIER",p[2]],"IN",["INTEGER",p[4]],"STEP",1,p[5]]
 def p_statement_assign_math(p):
     'statement : IDENTIFIER INSTANCE expression EOL'
-    p[0]=["ASSIGMENT",p[1],p[3]]
+    p[0]=["ASSIGMENT",["IDENTIFIER",p[1]],p[3]]
 def p_statement_assign_access_list(p):
     'statement : IDENTIFIER INSTANCE access_list EOL'
-    p[0]=["ASSIGMENT",p[1],p[3]]
+    p[0]=["ASSIGMENT",["IDENTIFIER",p[1]],p[3]]
 def p_statement_assign_boolean(p):
     'statement : IDENTIFIER INSTANCE BOOLEAN EOL'
-    p[0]=["ASSIGMENT",p[1],p[3]]
-def p_statement_assign_boolean(p):
+    p[0]=["ASSIGMENT",["IDENTIFER",p[1]],["BOOLEAN",p[3]]]
+def p_statement_assign_list(p):
     'statement : IDENTIFIER INSTANCE list EOL'
-    p[0]=["ASSIGMENT",p[1],p[3]]
+    p[0]=["ASSIGMENT",["IDENTIFIER",p[1]],p[3]]
 def p_statement_assing_method(p):
     'statement : IDENTIFIER INSTANCE methodcall EOL'
-    p[0]=p[1]
+    p[0]=[["IDENTIFIER",p[0]],p[1],p[2]]
+
 def p_statement_expression(p):
     'statement : expression EOL'
     p[0]=p[1]
@@ -322,13 +327,16 @@ def p_list_void(p):
     p[0]=["LIST",[]]
 def p_access_list(p):
     'access_list : IDENTIFIER index_list recursive_index'
-    p[0]=["ACCESS",p[1]]+p[2]+p[3]
+    p[0]=["ACCESS",["IDENTIFIER",p[1]]]+[p[2]]+p[3]
 
 def p_index_list(p):
     'index_list : L_SQUARE_PAREN allowed_access_index R_SQUARE_PAREN'
     p[0]=["SINGLE",p[2]]
 def p_index_list_range(p):
     'index_list : L_SQUARE_PAREN allowed_access_index COLON allowed_access_index R_SQUARE_PAREN'
+    p[0]=["RANGE",p[2],p[4]]
+def p_index_list_matrix_access(p):
+    'index_list : L_SQUARE_PAREN allowed_access_index COMA allowed_access_index R_SQUARE_PAREN'
     p[0]=["RANGE",p[2],p[4]]
 def p_index_list_range_start_no_defined(p):
     'index_list : L_SQUARE_PAREN COLON COMA allowed_access_index R_SQUARE_PAREN'
@@ -338,16 +346,16 @@ def p_index_list_range_end_no_defined(p):
     p[0]=["RANGE",p[2],"NODEFINED"]
 def p_allowed_access_index_integer(p):
     'allowed_access_index : INTEGER'
-    p[0]=p[1]
+    p[0]=["INTEGER",p[1]]
 def p_allowed_access_index_identifier(p):
     'allowed_access_index : IDENTIFIER'
-    p[0]=p[1]
+    p[0]=["IDENTIFIER",p[1]]
 def p_allowed_access_index_expression(p):
     'allowed_access_index : expression'
     p[0]=p[1]
 def p_recursive_index(p):
     'recursive_index : index_list recursive_index'
-    p[0]=p[1]+p[2]
+    p[0]=[p[1]]+p[2]
 def p_recursive_index_void(p):
     'recursive_index : '
     p[0]=[]
@@ -387,11 +395,11 @@ def p_term_factor(p):
 
 def p_factor_integer(p):
     'factor : INTEGER'
-    p[0] = p[1]
+    p[0] = ["INTEGER",p[1]]
 
 def p_factor_float(p):
     'factor : FLOAT'
-    p[0] = p[1]
+    p[0] = ["FLOAT",p[1]]
 
 def p_factor_function_call(p):
     'factor : functioncall'
@@ -405,7 +413,7 @@ def p_factor_list(p):
 
 def p_factor_id(p):
     'factor : IDENTIFIER'
-    p[0] = p[1]
+    p[0] = ["IDENTIFIER",p[1]]
 def p_factor_expr(p):
     'factor : L_PAREN expression R_PAREN'
     p[0] = p[2]
@@ -423,10 +431,11 @@ def p_term2_factor2(p):
     p[0] = p[1]
 def p_factor2_integer(p):
     'factor2 : INTEGER'
-    p[0] = p[1]
+    p[0] = ["INTEGER",p[1]]
 def p_factor2_float(p):
     'factor2 : FLOAT'
-    p[0] = p[1]
+    p[0] = ["FLOAT",p[1]]
+
 
 def p_factor2_function_call(p):
     'factor2 : functioncall'
@@ -443,7 +452,7 @@ def p_factor2_expr(p):
     p[0] = p[2]
 def p_factor2_id(p):
     'factor2 : IDENTIFIER'
-    p[0] = p[1]
+    p[0] = ["IDETIFIER",p[1]]
 
 def p_term2_factor(p):
     'term2 : factor'
@@ -453,26 +462,25 @@ def p_term2_factor(p):
 
 
 
-
 #iterables and noiterables 
 def p_iterable_identifier(p):
     'iterable : IDENTIFIER'
-    p[0]=p[1]
+    p[0]=["IDENTIFIER",p[1]]
 def p_noiterable_integer(p):
     'noiterable : INTEGER'
-    p[0]=p[1]
+    p[0]=["INTEGER",p[1]]
 
 def p_noiterable_float(p):
     'noiterable : FLOAT'
-    p[0]=p[1]
+    p[0]=["FLOAT",p[1]]
 
 def p_noiterable_boolean(p):
     'noiterable : BOOLEAN'
-    p[0]=p[1]
+    p[0]=["BOOLEAN",p[1]]
 # Error rule for syntax errors
 def p_error(p):
-    print(p)
-    print("Syntax error in input!")
+    print("Syntax error in line "+str(p.lineno),end="")
+    print(" symbol \'"+str(p.value)+"\'")
 
  
  # Build the parser
@@ -482,8 +490,27 @@ parser = yacc.yacc()
    
 file=open("fuente.pn",'r')
 s =file.read()
-#s="{var=12;var1=2**5;}"
-#s=input('calc> ')
-#print(s)
+mylexer = lex.lex()
+mylexer.input(s)
+
+
+while True:
+    tok = mylexer.token()
+    if not tok: 
+        break 
+    #print(tok)
+
+mylexer = lex.lex()
 result = parser.parse(s,lexer=mylexer)
-print(result)
+if(result!=None):
+    print(result)
+    print("_______________________________________________________________________")
+def pene():
+    myTree=create_tree_from_list(result)
+    #print(myTree)
+    TS=TSF(myTree)
+    #print(TS)
+    lista=myTree.inorder()
+    print("_______________________________________________________________________")
+    print(lista)
+    #print(AST)
