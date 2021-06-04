@@ -171,13 +171,13 @@ var=12;
 
 def p_program(p):
     'program : fun_block'
-    p[0]=["PROGRAM",p[1]]
+    p[0]=["PROGRAM"]+p[1]
 def p_fun_block(p):
     'fun_block : func'
-    p[0]=[p[1]]
+    p[0]=p[1]
 def p_fun_block_recursive(p):
     'fun_block : func fun_block'
-    p[0]=[p[1]]+p[2]
+    p[0]=[p[1],p[2]]
 def p_func_custom(p):
     'func : PROCEDURE IDENTIFIER Arguments scope'
     p[0]=["PROCEDURE",["IDENTIFIER",p[2]],p[3],p[4]]
@@ -190,7 +190,7 @@ def p_func_main(p):
 
 def p_Arguments(p):
     'Arguments : L_PAREN args R_PAREN'
-    p[0]=['ARGUMENTS',p[2]]
+    p[0]=['ARGUMENTS']+p[2]
 def p_Arguments_void(p):
     'Arguments : L_PAREN R_PAREN'
     p[0]=['ARGUMENTS',[]]
@@ -505,12 +505,9 @@ result = parser.parse(s,lexer=mylexer)
 if(result!=None):
     print(result)
     print("_______________________________________________________________________")
-def pene():
-    myTree=create_tree_from_list(result)
-    #print(myTree)
-    TS=TSF(myTree)
-    #print(TS)
-    lista=myTree.inorder()
-    print("_______________________________________________________________________")
+    myTree = create_tree_from_list(result)
+    lista = myTree.inorder()
     print(lista)
-    #print(AST)
+
+
+

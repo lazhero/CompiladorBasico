@@ -5,9 +5,10 @@ class m_node:
     def inorder(self):
         List=[self.Name]
         if(self.Children==[]):
-            return [self.Name]
+            return self.Name
         for i in self.Children:
-            List+=i.inorder()
+
+            List+=[i.inorder()]
         return List   
     def getChildren(self):
         return self.Children
@@ -23,8 +24,6 @@ def create_tree_from_list(lista):
     if(len(lista)==1):
         return m_node(lista[0],[])
     else:
-        if(lista[0]=="PROCEDURE"):
-            print(lista)
         Sons=[]
         for i in lista[1:]:
             Sons+=[create_tree_from_list(i)]
