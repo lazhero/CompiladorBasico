@@ -1,8 +1,5 @@
 from typing import Type
 
-from requests import ReadTimeout
-
-
 class Stack:
     def __init__(self):
         self.List=[]
