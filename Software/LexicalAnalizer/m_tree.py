@@ -16,6 +16,9 @@ class m_node:
         return self.Name
     def isLeaf(self):
         return self.Children==[]
+    
+
+    
 def create_tree_from_list(lista):
     if(not isinstance(lista,list)):
         return m_node(lista,[])

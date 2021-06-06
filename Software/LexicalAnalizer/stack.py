@@ -19,6 +19,9 @@ class Stack:
         Element=self.peek()
         if(Element!=None):
             self.List=self.List[1:]
-    
+    def copy(self):
+        self.List.copy()
+    def stack_to_list(self):
+        return self.List
 
 
