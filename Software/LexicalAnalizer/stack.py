@@ -23,5 +23,3 @@ class Stack:
         self.List.copy()
     def stack_to_list(self):
         return self.List
-
-

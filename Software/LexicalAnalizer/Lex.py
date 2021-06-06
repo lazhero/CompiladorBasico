@@ -503,9 +503,11 @@ while True:
 mylexer = lex.lex()
 result = parser.parse(s,lexer=mylexer)
 if(result!=None):
-    print(result)
-    print("_______________________________________________________________________")
+    #print(result)
+    #print("_______________________________________________________________________")
     myTree = create_tree_from_list(result)
+    TS=TSF(myTree)
+    print(TS)
     lista = myTree.inorder()
     table_symbol = TSF(myTree)
     print(table_symbol)
