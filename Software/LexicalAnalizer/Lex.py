@@ -5,72 +5,20 @@
  # numbers and +,-,*,/
  # ------------------------------------------------------------
 
+from Semantic import program
 from tokenize import Token
 import ply.lex as lex
 import ply.yacc as yacc
 from ply.ctokens import tokens
+from const import tokens
+from const import reserved
+from const import reserved_function_names
+from const import reserved_methods_names
 from m_tree import *
 from TS import TS_FROM_m_tree as TSF
  
  # List of token names.   This is always required
-tokens = [
-    'INTEGER',
-    'FLOAT',
-    'BOOLEAN',
-    'PLUS',
-    'MINUS',
-    'MULTIPLICATION',
-    'POW',
-    'DIVIDE',
-    'LEFTOVER',
-    'INT_DIVISION',
-    'COMPARATOR',
-    'L_PAREN',
-    'R_PAREN',
-    'L_SQUARE_PAREN',
-    'R_SQUARE_PAREN',
-    'UP_SCOPE',
-    'DOWN_SCOPE',
-    'IDENTIFIER',
-    'COMMENT',
-    'EOL',
-    'INSTANCE',
-    'METHOD_CALL_POINT',
-    'COMA',
-    'RESERVED_FUNC',
-    'RESERVED_METHOD',
-    'MAIN_FUNC',
-    'PROCEDURE',
-    'COLON'
-   
-]
-reserved = {
-    'if' : 'IF',
-    'else' : 'ELSE',
-    'for' : 'FOR',
-    'in' : 'IN',
-    'Step' : 'STEP',
- }
-reserved_function_names={
-    'blink' : 'BLINK',
-    'delay': 'DELAY',
-    'printLed' : "PRINT_LED" ,
-    'printLedX' : 'PRINT_LED_X',
-    'range' : 'RANGE',
-    'list'  : 'LIST',
-    'type' : 'TYPE',
-    'len': 'LEN',
-}
-#.get = get()
-reserved_methods_names={
-    'F':'F_METHOD',
-    'T': 'T_METHOD',
-    'Neg' : 'NEG',
-    'shapeF' : 'SHAPE_F',
-    'shapeC' : 'SHAPE_C',
-    'insert' : 'INSERT',
-    'delete': 'DELETE',
-}
+
 tokens=list(reserved.values())+tokens
 
  # Regular expression rules for simple tokens
@@ -119,7 +67,7 @@ comparator=r'('+equals+r'|'+lower+r'|'+lower_or_equal+r'|'+higher+r'|'+higher_or
 def t_COMPARATOR(t):
     return t
 def t_MAIN_FUNC(t):
-    r'main'
+    r'Main'
     return t
 def t_PROCEDURE(t):
     r'Procedure'
@@ -188,7 +136,7 @@ def p_func_custom(p):
 
 def p_func_main(p):
     'func : PROCEDURE MAIN_FUNC Arguments scope'
-    p[0]=['MAIN_FUNC',p[1],p[2],p[3]]
+    p[0]=['PROCEDURE',["IDENTIFIER",p[2]],p[3],p[4]]
 
 
 
@@ -513,7 +461,8 @@ if(result!=None):
     print(result)
     #print("_______________________________________________________________________")
    
-   # myTree = create_tree_from_list(result)
+    myTree = create_tree_from_list(result)
+    program(myTree)
     #TS=TSF(myTree)
     #print(TS)
     #lista = myTree.inorder()

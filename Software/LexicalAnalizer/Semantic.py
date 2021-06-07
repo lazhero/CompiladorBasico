@@ -1,6 +1,10 @@
+from function_descriptor import function_descriptor
+from const import reserved_function_names as prebuild
+from const import reserved_function_params as num_params
 from stack import Stack
+
 global TS
-TS={}
+TS={} #Table Symbol
 ARGUMENTS="ARGUMENTS"
 PARAMETERS="PARAMETERS"
 ASSIGNMENT="ASSIGNMENT"
@@ -9,11 +13,15 @@ FUNCTIONCALL="FUNCTIONCALL"
 SCOPE="SCOPE"
 
 def program(AST):
+    if not procedure_setting(AST):
+        raise Exception("No main found")
     for i in AST.getChildren():
         procedure(i)
+
+        
 def procedure(AST):
     Scope_Stack=Stack()
-    Scope_Stack.push(AST.getChildren()[0][1])
+    Scope_Stack.push(get_identifier(AST))
     Scope_Count=0
     process_children(AST,Scope_Count,Scope_Stack)
 
@@ -35,14 +43,23 @@ def method_call(AST,ScopeCount,ScopeStack):
     pass
 
 def assignment(AST,ScopeCount,ScopeStack):
+    # var1 = var2
+    # var1 = 5
+    # var1 = 2.3
+    # var1 = [1,2,3]
+    # var1 = True
+    # var1 = 4+3*123-(12.2-3.14)+lista[0]
+    # var1 = [True,True,True].Neg
+    stack = ScopeStack.copy()
+    identifier = get_identifier(AST) 
+
     pass
 
 def statement_classifier(statement,ScopeCount,ScopeStack):
+    print(statement.getData())
     StatementName=statement.getData()
     if (StatementName==SCOPE):
         return scope(statement,ScopeCount,ScopeStack)
-    if(StatementName==PARAMETERS):
-        return parameters(statement,ScopeCount,ScopeStack,0)
     if(StatementName==ASSIGNMENT):
         return assignment(statement,ScopeCount,ScopeStack)
     if(StatementName==METHODCALL):
@@ -59,3 +76,27 @@ def process_children(AST,Scope_Count,Scope_Stack):
 
 def in_TS(id_tuple):
     return id_tuple in TS.keys()
+
+
+def procedure_setting(AST):
+    main_flag=False
+    for i in AST.getChildren():
+       
+        proc_name= get_identifier(i)
+        #print(proc_name)
+        param_numbers=len(i.getChildren()[1].getData()[1:])
+        procedure=function_descriptor(proc_name,[param_numbers])
+        TS[((proc_name),())]=procedure
+        if (proc_name=="main"):
+            main_flag=True
+    return main_flag
+
+def prebuild_setting():
+    for value in prebuild.values:
+        procedure=function_descriptor(value,[num_params[value]])
+        TS[((value),())]=procedure
+    
+
+
+def get_identifier(AST):
+    return AST.getChildren()[0].getChildren()[0].getData()

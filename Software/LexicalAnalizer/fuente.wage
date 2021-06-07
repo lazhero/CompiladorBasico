@@ -3,9 +3,8 @@ Procedure pene1(var1,var2){
     pene=var.F;
  
 }
- 
-Procedure pene1(var1,var2){
-    pene=var.F;
- 
-}
 
+Procedure main(){
+   var1 = 4+3*123-(12.2-3.14)+lista[0];
+   globalbonita=33.21;
+}
