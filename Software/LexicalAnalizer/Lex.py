@@ -74,22 +74,22 @@ reserved_methods_names={
 tokens=list(reserved.values())+tokens
 
  # Regular expression rules for simple tokens
-t_PLUS             = r'\+'
-t_MINUS            = r'-'
+t_PLUS    = r'\+'
+t_MINUS   = r'-'
 t_MULTIPLICATION   = r'\*'
-t_DIVIDE           = r'/'
-t_INT_DIVISION     = r'//'
-t_LEFTOVER         = r'%'
-t_L_PAREN          = r'\('
-t_R_PAREN          = r'\)'
-t_L_SQUARE_PAREN   = r'\['
-t_R_SQUARE_PAREN   = r'\]'
-t_UP_SCOPE         =r'{'
-t_DOWN_SCOPE       =r'}'
-t_POW              =r'\*\*'
-t_ignore           = ' \t'
-t_EOL              =r';'
-t_INSTANCE         =r'='
+t_DIVIDE  = r'/'
+t_INT_DIVISION = r'//'
+t_LEFTOVER = r'%'
+t_L_PAREN  = r'\('
+t_R_PAREN  = r'\)'
+t_L_SQUARE_PAREN = r'\['
+t_R_SQUARE_PAREN = r'\]'
+t_UP_SCOPE=r'{'
+t_DOWN_SCOPE=r'}'
+t_POW=r'\*\*'
+t_ignore  = ' \t'
+t_EOL=r';'
+t_INSTANCE=r'='
 t_METHOD_CALL_POINT=r'\.'
 t_COMA=r','
 t_COLON=r':'
@@ -172,6 +172,10 @@ var=12;
 def p_program(p):
     'program : fun_block'
     p[0]=["PROGRAM"]+p[1]
+
+def p_program_fun(p):
+    'program : func'
+    p[0]=["PROGRAM",p[1]]
 def p_fun_block(p):
     'fun_block : func'
     p[0]=p[1]
@@ -208,6 +212,9 @@ def p_final_arg(p):
 def p_Parameters(p):
     'Parameters : L_PAREN params R_PAREN'
     p[0]=['PARAMETERS',p[2]]
+def p_Parameters_voidm(p):
+    'Parameters : '
+    p[0]=['PARAMETERS',[]]
 def p_Parameters_void(p):
     'Parameters : L_PAREN R_PAREN'
     p[0]=['PARAMETERS',[]]
@@ -295,7 +302,7 @@ def p_statement_assign_list(p):
     p[0]=["ASSIGMENT",["IDENTIFIER",p[1]],p[3]]
 def p_statement_assing_method(p):
     'statement : IDENTIFIER INSTANCE methodcall EOL'
-    p[0]=[["IDENTIFIER",p[0]],p[1],p[2]]
+    p[0]=["ASSIGMENT",["IDENTIFIER",p[1]],p[3]]
 
 def p_statement_expression(p):
     'statement : expression EOL'
@@ -503,14 +510,13 @@ while True:
 mylexer = lex.lex()
 result = parser.parse(s,lexer=mylexer)
 if(result!=None):
-    #print(result)
+    print(result)
     #print("_______________________________________________________________________")
-    myTree = create_tree_from_list(result)
-    TS=TSF(myTree)
-    print(TS)
-    lista = myTree.inorder()
-    table_symbol = TSF(myTree)
-    print(table_symbol)
+   
+   # myTree = create_tree_from_list(result)
+    #TS=TSF(myTree)
+    #print(TS)
+    #lista = myTree.inorder()
     #print(lista)
 
 
