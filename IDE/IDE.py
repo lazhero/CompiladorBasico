@@ -6,7 +6,7 @@ import subprocess
 root = Tk()
 root.title("Wage IDE")
 # Add main.iconbitmap()
-root.geometry("1200x660")
+root.geometry("1200x680")
 
 # Global variables
 global open_file_name, selected
@@ -14,7 +14,7 @@ open_file_name, selected = False, False
 
 
 # New file function
-def new_file():
+def new_file(e):
 	# Delete previous text
 	my_text.delete("1.0", END)
 	# Update status bar
@@ -25,7 +25,7 @@ def new_file():
 	open_file_name = False
 
 # Open file function
-def open_file():
+def open_file(e):
 	# Grab filename
 	text_file = filedialog.askopenfilename(initialdir="C:/", title="Open File", filetypes=(("Text Files", "*.txt"), ("Python Files", "*.py"), ("Wage Files", "*.wage"), ("All Files", "*.*")))
 
@@ -48,7 +48,7 @@ def open_file():
 		text_file.close()
 
 # Save as file function
-def save_as_file():
+def save_as_file(e):
 	text_file = filedialog.asksaveasfilename(defaultextension=".*", initialdir="C:/", title="Save File", filetypes=(("Text Files", "*.txt"), ("Python Files", "*.py"), ("Wage Files", "*.wage"), ("All Files", "*.*")))
 	name = text_file
 	if text_file:
@@ -62,7 +62,7 @@ def save_as_file():
 		root.title(f'{name} - Wage IDE')
 
 # Save file function
-def save_file():
+def save_file(e):
 	global open_file_name
 	if open_file_name:
 		# Save the file
@@ -139,12 +139,17 @@ my_frame.pack(pady=5)
 text_scroll = Scrollbar(my_frame)
 text_scroll.pack(side=RIGHT, fill=Y)
 
+# Horizontal scrollbar
+hor_scroll = Scrollbar(my_frame, orient='horizontal')
+hor_scroll.pack(side=BOTTOM, fill=X)
+
 # Create text box
-my_text = Text(my_frame, width=97, height=25, font=("Helvetica", 16), selectbackground="yellow", selectforeground="black", undo=True, yscrollcommand=text_scroll.set)
+my_text = Text(my_frame, width=97, height=25, font=("Helvetica", 16), selectbackground="yellow", selectforeground="black", undo=True, yscrollcommand=text_scroll.set, wrap="none", xscrollcommand=hor_scroll.set)
 my_text.pack()
 
 # Configure scrollbar
 text_scroll.config(command=my_text.yview)
+hor_scroll.config(command=my_text.xview)
 
 # Create menu
 my_menu = Menu(root)
@@ -153,21 +158,22 @@ root.config(menu=my_menu)
 # Add file menu	
 file_menu = Menu(my_menu, tearoff=False)
 my_menu.add_cascade(label="File", menu=file_menu)
-file_menu.add_command(label="New", command=new_file)
-file_menu.add_command(label="Open", command=open_file)
-file_menu.add_command(label="Save", command=save_file)
-file_menu.add_command(label="Save As", command=save_as_file)
+file_menu.add_command(label="New", command=lambda: new_file(False), accelerator="Ctrl+N")
+file_menu.add_command(label="Open", command=lambda: open_file(False), accelerator="Ctrl+O")
+file_menu.add_command(label="Save", command=lambda: save_file(False), accelerator="Ctrl+S")
+file_menu.add_command(label="Save As", command=lambda: save_as_file(False), accelerator="Ctrl+Shift+S")
 file_menu.add_separator()
 file_menu.add_command(label="Exit", command=root.quit)
 
 # Add edit menu
 edit_menu = Menu(my_menu, tearoff=False)
 my_menu.add_cascade(label="Edit", menu=edit_menu)
-edit_menu.add_command(label="Cut       Ctrl+X", command=lambda: cut_text(False))
-edit_menu.add_command(label="Copy    Ctrl+C", command=lambda: copy_text(False))
-edit_menu.add_command(label="Paste    Ctrl+V", command=lambda: paste_text(False))
-edit_menu.add_command(label="Undo")
-edit_menu.add_command(label="Redo")
+edit_menu.add_command(label="Cut", command=lambda: cut_text(False), accelerator="Ctrl+X")
+edit_menu.add_command(label="Copy", command=lambda: copy_text(False), accelerator="Ctrl+C")
+edit_menu.add_command(label="Paste", command=lambda: paste_text(False), accelerator="Ctrl+V")
+edit_menu.add_separator()
+edit_menu.add_command(label="Undo", command=my_text.edit_undo, accelerator="Ctrl+Z")
+edit_menu.add_command(label="Redo", command=my_text.edit_redo, accelerator="Ctrl+Y")
 
 # Add run menu
 run_menu = Menu(my_menu, tearoff=False)
@@ -176,16 +182,19 @@ run_menu.add_command(label="Run", command=run_file)
 
 # Add status bar to bottom of app
 status_bar = Label(root, text="Ready        ", anchor=E)
-status_bar.pack(fill=X, side=BOTTOM, ipady=5)
+status_bar.pack(fill=X, side=BOTTOM, ipady=15)
 
 #Edit bindings
+root.bind('<Control-n>', new_file)
+root.bind('<Control-o>', open_file)
+root.bind('<Control-s>', save_file)
+root.bind('<Control-Shift-S>', save_as_file)
+root.bind('<Escape>', quit)
 root.bind('<Control-x>', cut_text)
 root.bind('<Control-c>', copy_text)
 root.bind('<Control-v>', paste_text)
 
 code_output = Text(height=10)
 code_output.pack()
-
-
 
 root.mainloop()
