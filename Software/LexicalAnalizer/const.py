@@ -87,3 +87,13 @@ reserved_methods_names={
     'insert' : 'INSERT',
     'delete' : 'DELETE',
 }
+
+method_valid_type={
+    'F_METHOD': ['lista','bool'],
+    'T_METHOD': ['lista','bool'],
+    'NEG'     : ['lista','bool'],
+    'SHAPE_F' : ['lista'],
+    'SHAPE_C' : ['lista'],
+    'INSERT'  : ['lista'],
+    'DELETE'  : ['lista'],
+}

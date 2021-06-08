@@ -158,8 +158,8 @@ def p_args_element(p):
     'args : final_arg'
     p[0]=[p[1]]
 def p_final_arg(p):
-    'final_arg : iterable'
-    p[0]=p[1]
+    'final_arg : pene iterable'
+    p[0]=["ARGS",p[2],p[1]]
 
 
 def p_Parameters(p):
@@ -467,10 +467,10 @@ if(result!=None):
     print(result)
    
    
-    #myTree = create_tree_from_list(result)
+    myTree = create_tree_from_list(result)
     #print("_______________________________________________________________________")
     #print(myTree)
-    #program(myTree)
+    program(myTree)
     #TS=TSF(myTree)
     #print(TS)
     #lista = myTree.inorder()

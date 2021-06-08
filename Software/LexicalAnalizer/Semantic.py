@@ -1,6 +1,6 @@
 from descriptors import function_descriptor
 from const import reserved_function_names as prebuild
-from const import reserved_function_params as num_params
+from const import reserved_function_params as reserved_params
 from stack import Stack
 
 global TS
@@ -30,10 +30,6 @@ def scope(AST,ScopeCount,ScopeStack):
     ScopeCount += 1
     ScopeCount = process_children(AST,ScopeCount,ScopeStack)
     ScopeStack.pop()
-    return ScopeCount
-    
-def parameters(AST,ScopeCount,ScopeStack,funcName):
-    parameters=AST[1]
     return ScopeCount
     
 def function_call(AST,ScopeCount,ScopeStack):
@@ -84,24 +80,30 @@ def procedure_setting(AST):
        
         proc_name= get_identifier(i)
         parameters=getParamstypes(i)
+        print(parameters)
         param_numbers=len(i.getChildren()[1].getData()[1:])
         procedure=function_descriptor(proc_name,parameters)
         TS[((proc_name),())]=procedure
         if (proc_name=="main"):
             main_flag=True
     return main_flag
+
 def getParamstypes(AST):
     datatype=""
     typeslist=[]
     for i in AST.getChildren()[1].getChildren():
-        datatype=i.getChildren()[1].getData()
-        typeslist+=[datatype]
+        try:
+            datatype=i.getChildren()[1].getData()
+            typeslist+=[datatype]
+        except:
+            return []
+    return typeslist
 
 
 
 def prebuild_setting():
     for value in prebuild.values:
-        procedure=function_descriptor(value,[num_params[value]])
+        procedure=function_descriptor(value,reserved_params[value])
         TS[((value),())]=procedure
     
 

@@ -1,9 +1,11 @@
  
-Procedure pene1(var1,var2,var3){
-    pene2=var.F(var);
- 
+Procedure pene1(int var1,int var2,int var3){
+    pene2=var.F(algo1,algo2,algo3);
 }
 
+Procedure main(){
+    hola=4;
+}
 
 
 
