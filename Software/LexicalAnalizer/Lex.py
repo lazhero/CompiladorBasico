@@ -10,16 +10,18 @@ from tokenize import Token
 import ply.lex as lex
 import ply.yacc as yacc
 from ply.ctokens import tokens
+from const import FunctionDataSetters
 from const import tokens
 from const import reserved
 from const import reserved_function_names
 from const import reserved_methods_names
 from m_tree import *
 from TS import TS_FROM_m_tree as TSF
+from Semantic import program
  
  # List of token names.   This is always required
 
-tokens=list(reserved.values())+tokens
+tokens=list(reserved.values())+tokens+list(FunctionDataSetters)
 
  # Regular expression rules for simple tokens
 t_PLUS    = r'\+'
@@ -91,10 +93,13 @@ def t_IDENTIFIER(t):
     t.type = reserved.get(t.value,'IDENTIFIER')    # Check for reserved words
     Func = reserved_function_names.get(t.value,'IDENTIFIER')
     Method=reserved_methods_names.get(t.value,'IDENTIFIER')
+    DATATYPE=FunctionDataSetters.get(t.value,'IDENTIFIER')
     if(Func!='IDENTIFIER'):
         t.type= 'RESERVED_FUNC'
     if(Method!='IDENTIFIER'):
         t.type='RESERVED_METHOD'
+    if(DATATYPE!='IDENTIFIER'):
+        t.type='pene'
     return t
 def t_newline(t):
     r'\n+'
@@ -136,7 +141,7 @@ def p_func_custom(p):
 
 def p_func_main(p):
     'func : PROCEDURE MAIN_FUNC Arguments scope'
-    p[0]=['PROCEDURE',["IDENTIFIER",p[2]],p[3],p[4]]
+    p[0]=["PROCEDURE",["IDENTIFIER",p[2]],p[3],p[4]]
 
 
 
@@ -181,10 +186,11 @@ def p_final_param_noiterable(p):
 def p_final_param_list(p):
     'final_param : list'
     p[0]=p[1]
+'''
 def p_final_param_expression(p):
     'final_param : expression'
     p[0]=p[1]
-
+'''
 
 
 
@@ -214,10 +220,10 @@ def p_methodcall_list(p):
     p[0] = ["METHOD_CALL",p[1],["IDENTIFIER",p[3]],p[4]]
 def p_methodcall_reserved(p):
     'methodcall : IDENTIFIER METHOD_CALL_POINT RESERVED_METHOD Parameters'
-    p[0] = ["METHOD_CALL",["IDENTIFIER",p[1]],p[3],p[4]]
+    p[0] = ["METHOD_CALL",["IDENTIFIER",p[1]],["RESERVED_METHOD",p[3]],p[4]]
 def p_methodcall_list_reserved(p):
     'methodcall : access_list METHOD_CALL_POINT RESERVED_METHOD Parameters'
-    p[0] = ["METHOD_CALL",p[1],p[3],p[4]]
+    p[0] = ["METHOD_CALL",p[1],["RESERVED_METHOD",p[3]],p[4]]
 def p_statement_conditional_else(p):
     'statement : IF conditional scope ELSE scope'
     p[0]=["IF",p[2],p[3],p[4],p[5]]
@@ -459,10 +465,12 @@ mylexer = lex.lex()
 result = parser.parse(s,lexer=mylexer)
 if(result!=None):
     print(result)
-    #print("_______________________________________________________________________")
    
-    myTree = create_tree_from_list(result)
-    program(myTree)
+   
+    #myTree = create_tree_from_list(result)
+    #print("_______________________________________________________________________")
+    #print(myTree)
+    #program(myTree)
     #TS=TSF(myTree)
     #print(TS)
     #lista = myTree.inorder()

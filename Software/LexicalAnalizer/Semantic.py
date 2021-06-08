@@ -1,4 +1,4 @@
-from function_descriptor import function_descriptor
+from descriptors import function_descriptor
 from const import reserved_function_names as prebuild
 from const import reserved_function_params as num_params
 from stack import Stack
@@ -83,13 +83,21 @@ def procedure_setting(AST):
     for i in AST.getChildren():
        
         proc_name= get_identifier(i)
-        #print(proc_name)
+        parameters=getParamstypes(i)
         param_numbers=len(i.getChildren()[1].getData()[1:])
-        procedure=function_descriptor(proc_name,[param_numbers])
+        procedure=function_descriptor(proc_name,parameters)
         TS[((proc_name),())]=procedure
         if (proc_name=="main"):
             main_flag=True
     return main_flag
+def getParamstypes(AST):
+    datatype=""
+    typeslist=[]
+    for i in AST.getChildren()[1].getChildren():
+        datatype=i.getChildren()[1].getData()
+        typeslist+=[datatype]
+
+
 
 def prebuild_setting():
     for value in prebuild.values:

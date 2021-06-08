@@ -26,9 +26,18 @@ tokens = [
     'RESERVED_METHOD',
     'MAIN_FUNC',
     'PROCEDURE',
-    'COLON'
+    'COLON',
+    'pene',
    
 ]
+FunctionDataSetters={
+    'int':'int',
+    'float':'float',
+    'bool':'bool',
+    'lista' : 'lista',
+
+}
+
 reserved = {
     'if'    : 'IF',
     'else'  : 'ELSE',
@@ -46,16 +55,27 @@ reserved_function_names={
     'type'       : 'TYPE',
     'len'        : 'LEN',
 }
+reserved_special_time={
+    "'seg'":"'seg'",
+    "'min'":"'min'",
+    "'mil'":"'mil'",
+    
+}
+reserved_special_object={
+    "'F'":"'F'",
+    "'C'":"'C'",
+    "'M'": "'M'",
+}
 
 reserved_function_params={
-    'BLINK'      : 4,
-    'DELAY'      : 2,
-    "PRINT_LED"  : 3,
-    'PRINT_LED_X': 3,
-    'RANGE'      : 2,
-    'LIST'       : 1,
-    'TYPE'       : 1,
-    'LEN'        : 1,
+    'BLINK'      : [['lista','int'],['int'],["RESERVED_SPECIAL_TIME"],['bool']],
+    'DELAY'      : [['int'],["RESERVERD_SPECIAL_TIME"]],
+    "PRINT_LED"  : [['int'],['int'],['bool']],
+    'PRINT_LED_X': [["RESERVED_SPECIAL_OBJECT"],['int'],["lista"]],
+    'RANGE'      : [["int"],["bool"]],
+    'LIST'       : [['pene']],
+    'TYPE'       : [['ANY']],
+    'LEN'        : [["lista"]],
 }
 
 reserved_methods_names={

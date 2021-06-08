@@ -6,8 +6,9 @@ class m_node:
         List=[self.Name]
         if(self.Children==[]):
             return self.Name
+        if(self.Children==[None]):
+            return [self.Name,[]]
         for i in self.Children:
-
             List+=[i.inorder()]
         return List   
     def getChildren(self):
