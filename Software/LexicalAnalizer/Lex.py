@@ -165,18 +165,19 @@ def p_final_arg(p):
 def p_Parameters(p):
     'Parameters : L_PAREN params R_PAREN'
     p[0]=['PARAMETERS',p[2]]
-def p_Parameters_voidm(p):
-    'Parameters : '
-    p[0]=['PARAMETERS',[]]
 def p_Parameters_void(p):
     'Parameters : L_PAREN R_PAREN'
     p[0]=['PARAMETERS',[]]
+
 def p_params_list(p):
     'params : params COMA final_param'
     p[0]=p[1]+[p[3]]
 def p_params_element(p):
     'params : final_param'
     p[0]=[p[1]]
+def p_final_param_IDENTIFIER(p):
+    'final_param : IDENTIFIER'
+    p[0]=["IDENTIFIER",p[1]]
 def p_final_param_iterable(p):
     'final_param : iterable'
     p[0]=p[1]
@@ -186,11 +187,11 @@ def p_final_param_noiterable(p):
 def p_final_param_list(p):
     'final_param : list'
     p[0]=p[1]
-'''
+    
 def p_final_param_expression(p):
     'final_param : expression'
     p[0]=p[1]
-'''
+
 
 
 
@@ -224,6 +225,19 @@ def p_methodcall_reserved(p):
 def p_methodcall_list_reserved(p):
     'methodcall : access_list METHOD_CALL_POINT RESERVED_METHOD Parameters'
     p[0] = ["METHOD_CALL",p[1],["RESERVED_METHOD",p[3]],p[4]]
+def p_methodcall_2(p):
+    'methodcall : IDENTIFIER METHOD_CALL_POINT IDENTIFIER'
+    p[0] = ["METHOD_CALL",["IDENTIFIER",p[1]],["IDENTIFIER",p[3]],["PARAMETERS",[]]]
+def p_methodcall_list_2(p):
+    'methodcall : access_list METHOD_CALL_POINT IDENTIFIER'
+    p[0] = ["METHOD_CALL",p[1],["IDENTIFIER",p[3]],["PARAMETERS",[]]]
+def p_methodcall_reserved_2(p):
+    'methodcall : IDENTIFIER METHOD_CALL_POINT RESERVED_METHOD'
+    p[0] = ["METHOD_CALL",["IDENTIFIER",p[1]],["RESERVED_METHOD",p[3]],["PARAMETERS",[]]]
+def p_methodcall_list_reserved_2(p):
+    'methodcall : access_list METHOD_CALL_POINT RESERVED_METHOD'
+    p[0] = ["METHOD_CALL",p[1],["RESERVED_METHOD",p[3]],["PARAMETERS",[]]]
+
 def p_statement_conditional_else(p):
     'statement : IF conditional scope ELSE scope'
     p[0]=["IF",p[2],p[3],p[4],p[5]]
@@ -361,7 +375,9 @@ def p_factor_integer(p):
 def p_factor_float(p):
     'factor : FLOAT'
     p[0] = ["FLOAT",p[1]]
-
+def p_factor_id(p):
+    'factor : IDENTIFIER'
+    p[0] = ["IDENTIFIER",p[1]]
 def p_factor_function_call(p):
     'factor : functioncall'
     p[0]=p[1]
@@ -372,9 +388,7 @@ def p_factor_list(p):
     'factor : access_list'
     p[0]=p[1]
 
-def p_factor_id(p):
-    'factor : IDENTIFIER'
-    p[0] = ["IDENTIFIER",p[1]]
+
 def p_factor_expr(p):
     'factor : L_PAREN expression R_PAREN'
     p[0] = p[2]
@@ -397,7 +411,9 @@ def p_factor2_float(p):
     'factor2 : FLOAT'
     p[0] = ["FLOAT",p[1]]
 
-
+def p_factor2_id(p):
+    'factor2 : IDENTIFIER'
+    p[0] = ["IDETIFIER",p[1]]
 def p_factor2_function_call(p):
     'factor2 : functioncall'
     p[0]=p[1]
@@ -411,9 +427,7 @@ def p_factor2_list(p):
 def p_factor2_expr(p):
     'factor2 : L_PAREN expression R_PAREN'
     p[0] = p[2]
-def p_factor2_id(p):
-    'factor2 : IDENTIFIER'
-    p[0] = ["IDETIFIER",p[1]]
+
 
 def p_term2_factor(p):
     'term2 : factor'
