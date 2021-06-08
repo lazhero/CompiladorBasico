@@ -164,7 +164,7 @@ def p_final_arg(p):
 
 def p_Parameters(p):
     'Parameters : L_PAREN params R_PAREN'
-    p[0]=['PARAMETERS',p[2]]
+    p[0]=['PARAMETERS']+p[2]
 def p_Parameters_void(p):
     'Parameters : L_PAREN R_PAREN'
     p[0]=['PARAMETERS',[]]
@@ -282,16 +282,16 @@ def p_statement_list_access(p):
 
 def p_scope(p):
     'scope : UP_SCOPE group DOWN_SCOPE'
-    p[0]=["SCOPE",p[2]]
+    p[0]=["SCOPE"]+p[2]
 def p_group(p):
     'group : Succesion_of_Statements'
     p[0]=p[1]
 def p_Succesion_of_Statements_final(p):
     'Succesion_of_Statements : statement'
-    p[0]=p[1]
+    p[0]=[p[1]]
 def p_Succesion_of_Statements_init(p):
-    'Succesion_of_Statements : statement Succesion_of_Statements'
-    p[0]=[p[1],p[2]]
+    'Succesion_of_Statements : Succesion_of_Statements statement'
+    p[0]=p[1]+[p[2]]
 
 
 def p_list(p):
@@ -301,8 +301,8 @@ def p_list_void(p):
     'list : L_SQUARE_PAREN R_SQUARE_PAREN'
     p[0]=["LIST",[]]
 def p_access_list(p):
-    'access_list : IDENTIFIER index_list recursive_index'
-    p[0]=["ACCESS",["IDENTIFIER",p[1]]]+[p[2]]+p[3]
+    'access_list : IDENTIFIER recursive_index'
+    p[0]=["ACCESS",["IDENTIFIER",p[1]]]+p[2]
 
 def p_index_list(p):
     'index_list : L_SQUARE_PAREN allowed_access_index R_SQUARE_PAREN'
@@ -329,11 +329,11 @@ def p_allowed_access_index_expression(p):
     'allowed_access_index : expression'
     p[0]=p[1]
 def p_recursive_index(p):
-    'recursive_index : index_list recursive_index'
-    p[0]=[p[1]]+p[2]
+    'recursive_index : recursive_index index_list'
+    p[0]=p[1]+[p[2]]
 def p_recursive_index_void(p):
-    'recursive_index : '
-    p[0]=[]
+    'recursive_index : index_list'
+    p[0]=[p[1]]
 
 
 
@@ -384,10 +384,11 @@ def p_factor_function_call(p):
 def p_factor_method_call(p):
     'factor : methodcall'
     p[0]=p[1]
+'''
 def p_factor_list(p):
     'factor : access_list'
     p[0]=p[1]
-
+'''
 
 def p_factor_expr(p):
     'factor : L_PAREN expression R_PAREN'
@@ -420,10 +421,12 @@ def p_factor2_function_call(p):
 def p_factor2_method_call(p):
     'factor2 : methodcall'
     p[0]=p[1]
+
+'''
 def p_factor2_list(p):
     'factor2 : access_list'
     p[0]=p[1]
-
+'''
 def p_factor2_expr(p):
     'factor2 : L_PAREN expression R_PAREN'
     p[0] = p[2]
@@ -432,7 +435,7 @@ def p_factor2_expr(p):
 def p_term2_factor(p):
     'term2 : factor'
     p[0]=p[1]
-
+#
 
 
 
