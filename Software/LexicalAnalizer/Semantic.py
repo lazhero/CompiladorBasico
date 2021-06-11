@@ -1,8 +1,4 @@
 from ast import Raise
-from logging.config import IDENTIFIER
-from nis import cat
-
-from numpy import left_shift
 from descriptors import function_descriptor
 from const import reserved_function_names as prebuild
 from const import reserved_function_params as reserved_params
@@ -28,6 +24,7 @@ def program(AST):
     for i in AST.getChildren():
         procedure(i)
     print(TS)
+
 def procedure(AST):
     global MAIN_FLAG
     Scope_Stack=Stack()
@@ -36,6 +33,30 @@ def procedure(AST):
         MAIN_FLAG=False
     Scope_Count=0
     process_children(AST,Scope_Count,Scope_Stack)
+
+def process_children(AST,Scope_Count,Scope_Stack):
+    children=AST.getChildren()
+    if(AST.getData()=="PROCEDURE"):
+        print("EStoy en process")
+        children=children[1:]
+    for statement in children:
+        print(statement.getData())
+        Scope_Count=statement_classifier(statement,Scope_Count,Scope_Stack)
+    return Scope_Count
+
+def statement_classifier(statement,ScopeCount,ScopeStack):
+    StatementName=statement.getData()
+    print(StatementName)
+    if (StatementName==SCOPE):
+        return scope(statement,ScopeCount,ScopeStack)
+    if(StatementName==ASSIGNMENT):
+        return assignment(statement,ScopeCount,ScopeStack)
+    if(StatementName==METHODCALL):
+        return method_call(statement,ScopeCount,ScopeStack)
+    if(StatementName==FUNCTIONCALL):
+        return function_call(statement,ScopeCount,ScopeStack)
+    else:
+        return ScopeCount
 
 def scope(AST,ScopeCount,ScopeStack):
     global MAIN_FLAG
@@ -47,23 +68,11 @@ def scope(AST,ScopeCount,ScopeStack):
     ScopeCount = process_children(AST,ScopeCount,ScopeStack)
     ScopeStack.pop()
     return ScopeCount
+
 def function_call(AST,ScopeCount,ScopeStack):
     FunctionName=get_identifier(AST)
     Parameters_Node=AST.getChildren()[1]
     Parameters=parameters_type_func_call(Parameters_Node,ScopeStack)
-
-def parameters_type_func_call(AST,ScopeStack):
-    Parameters=[]
-    type=None
-    for Parameter in AST.getChildren():
-        ParameterType=Parameter.getData()
-        ParameterValue=Parameter.getChildren()[0].getData()
-        if(ParameterType=="IDENTIFIER"):
-            type=find_var_type(ParameterValue,ScopeStack)
-            Parameters+=[[type]]
-        else:
-            Parameters+=[[ParameterType]]
-    return Parameters
 
 def method_call(AST,ScopeCount,ScopeStack):
     pass
@@ -110,6 +119,7 @@ def get_operands(AST):
         left_operator=get_operands(AST.getChildren()[0])
         right_operator=get_operands(AST.getChildren()[1])
         return left_operator+right_operator
+
 def validate_expression(operands_list,Scope_Stack):
     expression_type=None
     element_class=None
@@ -141,10 +151,12 @@ def valid_change(type1,type2):
     if(type2=="INTEGER" and type1=="FLOAT"):
         return type1
     return None
+
 def just_identifier(AST,ScopeStack):
     prevVarName=AST.getChildren()[1].getChildren()[0].getData()
     new_type=find_var_type(prevVarName,ScopeStack)
     return new_type
+
 def find_var_type(VarName,Scope):
     StackCopy=Scope.copy()
     while(not StackCopy.is_empty()):
@@ -157,41 +169,10 @@ def find_var_type(VarName,Scope):
     except(KeyError):
         except_string='Variable: '+VarName+" not defined previoustly"
         raise Exception(except_string)
-    
-
-def statement_classifier(statement,ScopeCount,ScopeStack):
-    StatementName=statement.getData()
-    print(StatementName)
-    if (StatementName==SCOPE):
-        return scope(statement,ScopeCount,ScopeStack)
-    if(StatementName==ASSIGNMENT):
-        return assignment(statement,ScopeCount,ScopeStack)
-    if(StatementName==METHODCALL):
-        return method_call(statement,ScopeCount,ScopeStack)
-    if(StatementName==FUNCTIONCALL):
-        return function_call(statement,ScopeCount,ScopeStack)
-    else:
-        return ScopeCount
-
-def process_children(AST,Scope_Count,Scope_Stack):
-    children=AST.getChildren()
-    if(AST.getData()=="PROCEDURE"):
-        print("EStoy en process")
-        children=children[1:]
-    for statement in children:
-        print(statement.getData())
-        Scope_Count=statement_classifier(statement,Scope_Count,Scope_Stack)
-    return Scope_Count
-
-
-def in_TS(id_tuple):
-    return id_tuple in TS.keys()
-
 
 def procedure_setting(AST):
     main_flag=False
     for i in AST.getChildren():
-       
         proc_name= get_identifier(i)
         parameters=getParamstypes(i)
         param_numbers=len(i.getChildren()[1].getData()[1:])
@@ -200,6 +181,19 @@ def procedure_setting(AST):
         if (proc_name=="main"):
             main_flag=True
     return main_flag
+
+def parameters_type_func_call(AST,ScopeStack):
+    Parameters=[]
+    type=None
+    for Parameter in AST.getChildren():
+        ParameterType=Parameter.getData()
+        ParameterValue=Parameter.getChildren()[0].getData()
+        if(ParameterType=="IDENTIFIER"):
+            type=find_var_type(ParameterValue,ScopeStack)
+            Parameters+=[[type]]
+        else:
+            Parameters+=[[ParameterType]]
+    return Parameters
 
 def getParamstypes(AST):
     datatype=""
@@ -212,13 +206,13 @@ def getParamstypes(AST):
             return []
     return typeslist
 
-
 def prebuild_setting():
     for value in prebuild.values():
         #procedure=function_descriptor(value,reserved_params[value])
-        TS[(value)]=reserved_params
-    
+        TS[(value)]=reserved_params 
 
+def in_TS(id_tuple):
+    return id_tuple in TS.keys()
 
 def get_identifier(AST):
     return AST.getChildren()[0].getChildren()[0].getData()

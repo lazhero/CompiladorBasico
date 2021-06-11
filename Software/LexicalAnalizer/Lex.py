@@ -65,6 +65,7 @@ higher_or_equal=r'>='
 pow=r'\*\*'
 operators=r'('+pow+r'|'+multiplication+r'|'+division+r'|'+int_division+r'|'+leftover+r'|'+plus+r'|'+minus+r')'
 comparator=r'('+equals+r'|'+lower+r'|'+lower_or_equal+r'|'+higher+r'|'+higher_or_equal+r')'
+
 @lex.Token(comparator)
 def t_COMPARATOR(t):
     return t
@@ -89,6 +90,7 @@ def t_COMMENT(t):
     r'\#\#.*'
     pass
 @lex.TOKEN(identifier)
+
 def t_IDENTIFIER(t):
     t.type = reserved.get(t.value,'IDENTIFIER')    # Check for reserved words
     Func = reserved_function_names.get(t.value,'IDENTIFIER')
@@ -104,8 +106,6 @@ def t_IDENTIFIER(t):
 def t_newline(t):
     r'\n+'
     t.lexer.lineno += len(t.value)
-
-
  
  # Error handling rule
 def t_error(t):
@@ -115,35 +115,26 @@ def t_error(t):
  
  # Build the lexer
 
-
-data = '''main
-pene
-caradura
-var=12;
-'''
-
 def p_program(p):
     'program : fun_block'
     p[0]=["PROGRAM"]+p[1]
-
 def p_program_fun(p):
     'program : func'
     p[0]=["PROGRAM",p[1]]
+
 def p_fun_block(p):
     'fun_block : func'
     p[0]=p[1]
 def p_fun_block_recursive(p):
     'fun_block : func fun_block'
     p[0]=[p[1],p[2]]
+
 def p_func_custom(p):
     'func : PROCEDURE IDENTIFIER Arguments scope'
     p[0]=["PROCEDURE",["IDENTIFIER",p[2]],p[3],p[4]]
-
 def p_func_main(p):
     'func : PROCEDURE MAIN_FUNC Arguments scope'
     p[0]=["PROCEDURE",["IDENTIFIER",p[2]],p[3],p[4]]
-
-
 
 def p_Arguments(p):
     'Arguments : L_PAREN args R_PAREN'
@@ -151,16 +142,17 @@ def p_Arguments(p):
 def p_Arguments_void(p):
     'Arguments : L_PAREN R_PAREN'
     p[0]=['ARGUMENTS',[]]
+
 def p_args_list(p):
     'args : args COMA final_arg'
     p[0]=p[1]+[p[3]]
 def p_args_element(p):
     'args : final_arg'
     p[0]=[p[1]]
+
 def p_final_arg(p):
     'final_arg : pene iterable'
     p[0]=["ARGS",p[2],p[1]]
-
 
 def p_Parameters(p):
     'Parameters : L_PAREN params R_PAREN'
@@ -186,11 +178,9 @@ def p_final_param_iterable(p):
 def p_final_param_noiterable(p):
     'final_param : noiterable'
     p[0]=p[1]
-
 def p_final_param_list(p):
     'final_param : list'
-    p[0]=p[1]
-    
+    p[0]=p[1] 
 def p_final_param_expression(p):
     'final_param : expression'
     p[0]=p[1]
@@ -213,6 +203,7 @@ def p_functioncall(p):
 def p_functioncall_reserver(p):
     'functioncall : RESERVED_FUNC Parameters'
     p[0] = ["CALL_FUNC",p[1],p[2]]
+
 def p_methodcall(p):
     'methodcall : IDENTIFIER METHOD_CALL_POINT IDENTIFIER Parameters'
     p[0] = ["METHOD_CALL",["IDENTIFIER",p[1]],["IDENTIFIER",p[3]],p[4]]
@@ -241,9 +232,11 @@ def p_methodcall_list_reserved_2(p):
 def p_statement_conditional_else(p):
     'statement : IF conditional scope ELSE scope'
     p[0]=["IF",p[2],p[3],p[4],p[5]]
+
 def p_conditional(p):
     'conditional : IDENTIFIER COMPARATOR noiterable'
     p[0]= ["CONDITIONAL",["COMPARATOR",p[2]], ["IDENTIFIER",p[1]], p[3]]
+
 def p_statement_iteracionstep(p):
     'statement : FOR IDENTIFIER IN iterable STEP INTEGER scope'
     p[0]=["FOR",["IDENTIFIER",p[2]],["IN",p[4]],["STEP",["INTEGER",p[6]]],p[7]]
