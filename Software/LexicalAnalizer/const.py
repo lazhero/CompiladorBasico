@@ -97,3 +97,4 @@ method_valid_type={
     'INSERT'  : ['lista'],
     'DELETE'  : ['lista'],
 }
+operators=['+','*','**','/','//','-']

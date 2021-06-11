@@ -175,6 +175,8 @@ def p_params_list(p):
 def p_params_element(p):
     'params : final_param'
     p[0]=[p[1]]
+
+
 def p_final_param_IDENTIFIER(p):
     'final_param : IDENTIFIER'
     p[0]=["IDENTIFIER",p[1]]
@@ -184,6 +186,7 @@ def p_final_param_iterable(p):
 def p_final_param_noiterable(p):
     'final_param : noiterable'
     p[0]=p[1]
+
 def p_final_param_list(p):
     'final_param : list'
     p[0]=p[1]
@@ -191,9 +194,6 @@ def p_final_param_list(p):
 def p_final_param_expression(p):
     'final_param : expression'
     p[0]=p[1]
-
-
-
 
 def p_statement_scope(p):
     'statement : scope'
@@ -246,16 +246,16 @@ def p_conditional(p):
     p[0]= ["CONDITIONAL",["COMPARATOR",p[2]], ["IDENTIFIER",p[1]], p[3]]
 def p_statement_iteracionstep(p):
     'statement : FOR IDENTIFIER IN iterable STEP INTEGER scope'
-    p[0]=["FOR",["IDENTIFIER",p[2]],"IN",p[4],"STEP",["INTEGER",p[6]],p[7]]
+    p[0]=["FOR",["IDENTIFIER",p[2]],["IN",p[4]],["STEP",["INTEGER",p[6]]],p[7]]
 def p_statement_iteracion_step_integer(p):
     'statement : FOR IDENTIFIER IN INTEGER STEP INTEGER scope'
-    p[0]=["FOR",["IDENTIFIER",p[2]],"IN",["INTEGER",p[4]],"STEP",p[6],p[7]]
+    p[0]=["FOR",["IDENTIFIER",p[2]],["IN",["INTEGER",p[4]]],["STEP",p[6]],p[7]]
 def p_statement_iteracion(p):
     'statement : FOR IDENTIFIER IN iterable scope'
-    p[0]=["FOR",["IDENTIFIER",p[2]],"IN",p[4],"STEP",1,p[5]]
+    p[0]=["FOR",["IDENTIFIER",p[2]],["IN",p[4]],["STEP",1],p[5]]
 def p_statement_iteracion_integer(p):
     'statement : FOR IDENTIFIER IN INTEGER scope'
-    p[0]=["FOR",["IDENTIFIER",p[2]],"IN",["INTEGER",p[4]],"STEP",1,p[5]]
+    p[0]=["FOR",["IDENTIFIER",p[2]],["IN",["INTEGER",p[4]]],["STEP",1],p[5]]
 def p_statement_assign_math(p):
     'statement : IDENTIFIER INSTANCE expression EOL'
     p[0]=["ASSIGMENT",["IDENTIFIER",p[1]],p[3]]
@@ -295,11 +295,27 @@ def p_Succesion_of_Statements_init(p):
 
 
 def p_list(p):
-    'list : L_SQUARE_PAREN params R_SQUARE_PAREN'
-    p[0]=["LIST",p[2]]
+    'list : L_SQUARE_PAREN params2 R_SQUARE_PAREN'
+    p[0]=["LIST"]+p[2]
 def p_list_void(p):
     'list : L_SQUARE_PAREN R_SQUARE_PAREN'
-    p[0]=["LIST",[]]
+    p[0]=["LIST"]
+
+
+def p_params2_list(p):
+    'params2 : params2 COMA final_param2'
+    p[0]=p[1]+[p[3]]
+def p_params2_element(p):
+    'params2 : final_param2'
+    p[0]=[p[1]]
+
+
+def p_final_param2_IDENTIFIER(p):
+    'final_param2 : BOOLEAN'
+    p[0]=["BOOLEAN",p[1]]
+
+
+
 def p_access_list(p):
     'access_list : IDENTIFIER recursive_index'
     p[0]=["ACCESS",["IDENTIFIER",p[1]]]+p[2]
@@ -334,13 +350,6 @@ def p_recursive_index(p):
 def p_recursive_index_void(p):
     'recursive_index : index_list'
     p[0]=[p[1]]
-
-
-
-
-
-
-
 #Math managing
 def p_expression_plus(p):
      'expression : expression PLUS term'

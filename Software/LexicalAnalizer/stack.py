@@ -24,6 +24,9 @@ class Stack:
         
     def stack_to_list(self):
         return self.List
+    def is_empty(self):
+        return self.List==[]
+
 
 
 def list_to_stack(stack_list):

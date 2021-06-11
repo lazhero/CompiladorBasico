@@ -1,11 +1,11 @@
  
-Procedure pene1(int var1,int var2,int var3){
-    pene2=var.F(algo1,algo2,algo3);
+
+
+Procedure main(int carajo,int pene){
+    pene=[FALSE,TRUE,TRUE,FALSE];
+    main(pene,pene);
 }
 
-Procedure main(){
-    hola=4;
-}
 
 
 

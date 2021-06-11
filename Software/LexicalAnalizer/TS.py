@@ -12,8 +12,6 @@ def TS_FROM_m_tree(Node):
     TS={}
     return TS_FROM_m_tree_aux(Node,stack,TS)
 
-
-#def TS_FROM_m_tree_aux(node,stack,scope_count,TS):
     
 def TS_FROM_m_tree_aux(Node,Stack,TS):
     for i in Node.getChildren():
@@ -31,10 +29,14 @@ def TS_FROM_m_tree_aux(Node,Stack,TS):
             TS_FROM_m_tree_aux(i,Stack,TS)
     #print(TS)
     return TS
-
+    
 def id_names(hijos):
     lista=[]
     for i in hijos:
         lista+=[i.getData()]
     return lista
-        
+
+
+'''
+procedure 
+'''
