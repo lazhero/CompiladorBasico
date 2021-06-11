@@ -88,7 +88,7 @@ reserved_methods_names={
     'delete' : 'DELETE',
 }
 
-method_valid_type={
+method_valid_caller={
     'F_METHOD': ['lista','bool'],
     'T_METHOD': ['lista','bool'],
     'NEG'     : ['lista','bool'],
@@ -97,4 +97,10 @@ method_valid_type={
     'INSERT'  : ['lista'],
     'DELETE'  : ['lista'],
 }
+method_valid_params_types={
+    'INSERT':[['list'],['valid_insertion'],['int']],
+    'DELETE':[['int'],['valid_insertion']]
+}
+valid_insertion_type=[0,1]
+
 operators=['+','*','**','/','//','-']

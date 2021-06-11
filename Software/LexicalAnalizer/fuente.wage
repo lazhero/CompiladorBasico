@@ -2,9 +2,10 @@
 
 
 Procedure main(int carajo,int pene){
-    pene=[FALSE,TRUE,TRUE,FALSE];
-    main(pene,pene);
+   var=[[TRUE,TRUE],[FALSE,FALSE]];
+   var.shapeF;
 }
+
 
 
 

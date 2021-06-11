@@ -196,7 +196,7 @@ def p_statement_functioncall(p):
     p[0]=p[1]
 def p_statement_methodcall(p):
     'statement : methodcall EOL'
-
+    p[0]=p[1]
 def p_functioncall(p):
     'functioncall : IDENTIFIER Parameters'
     p[0] = ["CALL_FUNC",["IDENTIFIER",p[1]],p[2]]
@@ -218,16 +218,16 @@ def p_methodcall_list_reserved(p):
     p[0] = ["METHOD_CALL",p[1],["RESERVED_METHOD",p[3]],p[4]]
 def p_methodcall_2(p):
     'methodcall : IDENTIFIER METHOD_CALL_POINT IDENTIFIER'
-    p[0] = ["METHOD_CALL",["IDENTIFIER",p[1]],["IDENTIFIER",p[3]],["PARAMETERS",[]]]
+    p[0] = ["METHOD_CALL",["IDENTIFIER",p[1]],["IDENTIFIER",p[3]],["PARAMETERS"]]
 def p_methodcall_list_2(p):
     'methodcall : access_list METHOD_CALL_POINT IDENTIFIER'
     p[0] = ["METHOD_CALL",p[1],["IDENTIFIER",p[3]],["PARAMETERS",[]]]
 def p_methodcall_reserved_2(p):
     'methodcall : IDENTIFIER METHOD_CALL_POINT RESERVED_METHOD'
-    p[0] = ["METHOD_CALL",["IDENTIFIER",p[1]],["RESERVED_METHOD",p[3]],["PARAMETERS",[]]]
+    p[0] = ["METHOD_CALL",["IDENTIFIER",p[1]],["RESERVED_METHOD",p[3]],["PARAMETERS"]]
 def p_methodcall_list_reserved_2(p):
     'methodcall : access_list METHOD_CALL_POINT RESERVED_METHOD'
-    p[0] = ["METHOD_CALL",p[1],["RESERVED_METHOD",p[3]],["PARAMETERS",[]]]
+    p[0] = ["METHOD_CALL",p[1],["RESERVED_METHOD",p[3]],["PARAMETERS"]]
 
 def p_statement_conditional_else(p):
     'statement : IF conditional scope ELSE scope'
@@ -276,6 +276,9 @@ def p_statement_list_access(p):
 def p_scope(p):
     'scope : UP_SCOPE group DOWN_SCOPE'
     p[0]=["SCOPE"]+p[2]
+def p_scope_void(p):
+    'scope : UP_SCOPE DOWN_SCOPE'
+    p[0]=["SCOPE"]
 def p_group(p):
     'group : Succesion_of_Statements'
     p[0]=p[1]
@@ -302,8 +305,10 @@ def p_params2_element(p):
     'params2 : final_param2'
     p[0]=[p[1]]
 
-
-def p_final_param2_IDENTIFIER(p):
+def p_final_param2_LIST(p):
+    'final_param2 : list'
+    p[0]=p[1]
+def p_final_param2_BOOLEAN(p):
     'final_param2 : BOOLEAN'
     p[0]=["BOOLEAN",p[1]]
 

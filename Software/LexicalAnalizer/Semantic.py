@@ -2,6 +2,8 @@ from ast import Raise
 from descriptors import function_descriptor
 from const import reserved_function_names as prebuild
 from const import reserved_function_params as reserved_params
+from const import reserved_methods_names as prebuild_method
+from const import method_valid_type as reserverd_method_params
 from const import operators
 from stack import Stack
 
@@ -13,17 +15,17 @@ ARGUMENTS="ARGUMENTS"
 PARAMETERS="PARAMETERS"
 ASSIGNMENT="ASSIGMENT"
 METHODCALL="METHOD_CALL"
-FUNCTIONCALL="FUNC_CALL"
+FUNCTIONCALL="CALL_FUNC"
 SCOPE="SCOPE"
 
 def program(AST):
     MAIN_FLAG=True
-    #prebuild_setting()
+    prebuild_setting()
     if not procedure_setting(AST):
         raise Exception("No main found")
     for i in AST.getChildren():
         procedure(i)
-    print(TS)
+    #print(TS)
 
 def procedure(AST):
     global MAIN_FLAG
@@ -37,14 +39,13 @@ def procedure(AST):
 def process_children(AST,Scope_Count,Scope_Stack):
     children=AST.getChildren()
     if(AST.getData()=="PROCEDURE"):
-        print("EStoy en process")
         children=children[1:]
     for statement in children:
-        print(statement.getData())
         Scope_Count=statement_classifier(statement,Scope_Count,Scope_Stack)
     return Scope_Count
 
 def statement_classifier(statement,ScopeCount,ScopeStack):
+
     StatementName=statement.getData()
     print(StatementName)
     if (StatementName==SCOPE):
@@ -71,14 +72,24 @@ def scope(AST,ScopeCount,ScopeStack):
 
 def function_call(AST,ScopeCount,ScopeStack):
     FunctionName=get_identifier(AST)
+    print(FunctionName)
     Parameters_Node=AST.getChildren()[1]
-    Parameters=parameters_type_func_call(Parameters_Node,ScopeStack)
+    Parameters_given=parameters_type_func_call(Parameters_Node,ScopeStack)
+    Parameters_requested=TS[FunctionName]
+    valid_parameter_type(Parameters_requested,Parameters_given)
+    return ScopeCount
 
 def method_call(AST,ScopeCount,ScopeStack):
-    pass
-
+    VarName=get_identifier(AST)
+    MethodName=AST.getChildren()[0].getChildren()[1].getData()
+    print("MEthod")
+    print(MethodName)
+    Parameters_Node=AST.getChildren()[2]
+    Parameters_given=parameters_type_func_call(Parameters_Node,ScopeStack)
+    Parameters_requested=TS[MethodName]
+    valid_parameter_type(Parameters_requested,Parameters_given)
+    return ScopeCount
 def assignment(AST,ScopeCount,ScopeStack):
-    print("el pene del wage es hermoso")
     element_classifier=AST.getChildren()[1].getData()
     varName=AST.getChildren()[0].getChildren()[0].getData()
     current_type=None
@@ -101,8 +112,9 @@ def assignment(AST,ScopeCount,ScopeStack):
         assign_type=just_identifier(AST,ScopeStack)
     else:
         assign_type="NOT_DEFINED"
-    if(current_type==None or current_type==assign_type):
-        TS[tuple(ScopeStack.stack_to_list()),varName]=assign_type
+    final_type=valid_change(current_type,assign_type)
+    if(final_type!=None):
+        var_to_TS(ScopeStack,varName,final_type)
     else:
         raise Exception("The "+varName+"'s type has changed")
     return ScopeCount
@@ -127,11 +139,11 @@ def validate_expression(operands_list,Scope_Stack):
         element_class=operand.getData()
         if(element_class=="IDENTIFIER"):
             element_class=just_identifier(operand,Scope_Stack)
-            if(element_class=="NO_DEFINED"):
+            if(element_class=="NOT_DEFINED"):
                 return element_class
-        elif(element_class=="FUNC_CALL"):
+        elif(element_class==FUNCTIONCALL):
             return "NOT_DEFINED"
-        elif(element_class=="METHOD_CALL"):
+        elif(element_class==METHODCALL):
             return "NOT_DEFINED"
         
         expression_type=valid_change(expression_type,element_class)
@@ -144,12 +156,15 @@ def valid_change(type1,type2):
         return type2
     if(type2==None):
         return type1
+    if(type1=="NOT_DEFINED" or type2=="NOT_DEFINED"):
+        return type1
     if(type1==type2):
         return type1
     if(type1=="INTEGER" and type2=="FLOAT"):
         return type2
     if(type2=="INTEGER" and type1=="FLOAT"):
         return type1
+
     return None
 
 def just_identifier(AST,ScopeStack):
@@ -172,9 +187,12 @@ def find_var_type(VarName,Scope):
 
 def procedure_setting(AST):
     main_flag=False
+    ScopeStack=None
     for i in AST.getChildren():
         proc_name= get_identifier(i)
-        parameters=getParamstypes(i)
+        ScopeStack=Stack()
+        ScopeStack.push(proc_name)
+        parameters=getParamstypes(i,ScopeStack)
         param_numbers=len(i.getChildren()[1].getData()[1:])
         #procedure=function_descriptor(proc_name,parameters)
         TS[(proc_name)]=parameters
@@ -195,24 +213,37 @@ def parameters_type_func_call(AST,ScopeStack):
             Parameters+=[[ParameterType]]
     return Parameters
 
-def getParamstypes(AST):
+def getParamstypes(AST,ScopeStack):
     datatype=""
     typeslist=[]
     for i in AST.getChildren()[1].getChildren():
         try:
+            varName=get_identifier(i)
             datatype=i.getChildren()[1].getData()
             typeslist+=[[datatype]]
+            var_to_TS(ScopeStack,varName,datatype)
         except:
             return []
     return typeslist
+def valid_parameter_type(requested_param,given_param):
+    if(len(requested_param)!=len(given_param)):
+        raise Exception("The number of params doesnt match")
+    for i in range(len(requested_param)):
+        for j in range(len(given_param[i])):
+            if(given_param[i][j] not in requested_param[i]):
+                raise Exception("The var params types doesnt match")
+    
 
 def prebuild_setting():
     for value in prebuild.values():
-        #procedure=function_descriptor(value,reserved_params[value])
-        TS[(value)]=reserved_params 
+        TS[(value)]=reserved_params[value]
+    for value in prebuild_method.values():
+        TS[(value)]=reserverd_method_params[value]
 
 def in_TS(id_tuple):
     return id_tuple in TS.keys()
 
 def get_identifier(AST):
     return AST.getChildren()[0].getChildren()[0].getData()
+def var_to_TS(ScopeStack,varName,dataType):
+    TS[tuple(ScopeStack.stack_to_list()),varName]=dataType
