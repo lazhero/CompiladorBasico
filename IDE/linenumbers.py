@@ -4,6 +4,7 @@ from tkinter import filedialog
 from tkinter import font
 import subprocess
 import os
+import pathlib
 
 global open_file_name, selected
 open_file_name, selected = False, False
@@ -112,11 +113,19 @@ class ScrollText(tk.Frame):
         if open_file_name:
             code_output = Text(height=10)
             code_output.pack()
-            command = command = ["python","compile.py","compile",open_file_name]
+            compiler_route=get_compiler_route()
+            test = subprocess.Popen(["ping","-W","2","-c", "1", "google.com"], stdout=subprocess.PIPE)
+            output = test.communicate()[0]
+            print(output)
+            '''
+            command = command = ["python",compiler_route,"compile",open_file_name]
             process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
             output, error = process.communicate()
             code_output.insert('1.0', output)
             code_output.insert('1.0', error)
+            print(error)
+            print("pene")
+            '''
         else:
             self.open_file(FALSE)
     def compile(self):
@@ -149,7 +158,10 @@ class TextLineNumbers(tk.Canvas):
 
 
 '''END OF Bryan Oakley's CODE'''
-
+def get_compiler_route():
+    init_route=pathlib.Path(__file__).parent.parent
+    init_route=init_route /'SoftWare'/ 'LexicalAnalizer'/'compile.py'
+    return init_route.absolute()
 if __name__ == '__main__':
     root = tk.Tk()
     my_menu = Menu(root)
