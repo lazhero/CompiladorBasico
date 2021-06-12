@@ -156,20 +156,24 @@ def FOR_STATEMENT(AST,ScopeCount,ScopeStack):
     return count
 
 def IF_statement(AST,ScopeCount,ScopeStack):
-    print(TS)
-    print(ScopeStack.stack_to_list())
     iterable_name = AST.getChildren()[0].getChildren()[1].getChildren()[0].getData()
-    print(iterable_name)
     iterable_type = find_var_type(iterable_name,ScopeStack)
-
-    compared_type = AST.getChildren()[0].getChildren()[2].getChildren()[0].getData()
+    compared_value = AST.getChildren()[0].getChildren()[2].getChildren()[0].getData()
+    compared_type=AST.getChildren()[0].getChildren()[2].getData()
+    print(iterable_name)
+    print(iterable_type)
     print(compared_type)
-    '''
+    print(compared_value)
+    if_scope=AST.getChildren()[1]
+    else_scope=AST.getChildren()[2].getChildren()[0]
     if (compared_type == 'IDENTIFIER'):
-        compared_type=
-        pass
-    pass
-    '''
+        compared_type=find_var_type(compared_value,ScopeStack)
+    else:
+        compared_type=transform_value(compared_type)
+    if(compared_type!=iterable_type):
+        raise Exception("Cant compare "+compared_type+" with "+iterable_type)
+    ScopeCount=scope(if_scope,ScopeCount,ScopeStack)
+    return scope(else_scope,ScopeCount,ScopeStack)
 def just_math_expression(AST,ScopeStack):
     elements=get_operands(AST.getChildren()[1])
     return  validate_expression(elements,ScopeStack)
