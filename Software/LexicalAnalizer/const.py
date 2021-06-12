@@ -28,6 +28,7 @@ tokens = [
     'PROCEDURE',
     'COLON',
     'pene',
+    'STRING'
    
 ]
 FunctionDataSetters={
@@ -55,17 +56,8 @@ reserved_function_names={
     'type'       : 'TYPE',
     'len'        : 'LEN',
 }
-reserved_special_time={
-    "'seg'":"'seg'",
-    "'min'":"'min'",
-    "'mil'":"'mil'",
-    
-}
-reserved_special_object={
-    "'F'":"'F'",
-    "'C'":"'C'",
-    "'M'": "'M'",
-}
+
+
 
 reserved_function_params={
     'BLINK'      : [['lista','int'],['int'],["RESERVED_SPECIAL_TIME"],['bool']],
@@ -77,7 +69,6 @@ reserved_function_params={
     'TYPE'       : [['ANY']],
     'LEN'        : [["lista"]],
 }
-
 reserved_methods_names={
     'F'      :'F_METHOD',
     'T'      : 'T_METHOD',
@@ -99,8 +90,16 @@ method_valid_caller={
 }
 method_valid_params_types={
     'INSERT':[['list'],['valid_insertion'],['int']],
-    'DELETE':[['int'],['valid_insertion']]
+    'DELETE':[['int'],['valid_insertion']],
+    'F_METHOD':[],
+    'T_METHOD':[],
+    'NEG':[],
+    'SHAPE_F':[],
+    'SHAPE_C':[],
+
 }
 valid_insertion_type=[0,1]
+reserved_special_time=[ "'seg'","'min'","'mil'"]
+reserved_special_object=[ "'F'", "'C'","'M'",]
 
 operators=['+','*','**','/','//','-']

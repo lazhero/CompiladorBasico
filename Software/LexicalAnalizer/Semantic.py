@@ -3,7 +3,8 @@ from descriptors import function_descriptor
 from const import reserved_function_names as prebuild
 from const import reserved_function_params as reserved_params
 from const import reserved_methods_names as prebuild_method
-from const import method_valid_type as reserverd_method_params
+from const import method_valid_params_types as reserverd_method_params
+from const import method_valid_caller as valid_caller_dic
 from const import operators
 from stack import Stack
 
@@ -81,9 +82,9 @@ def function_call(AST,ScopeCount,ScopeStack):
 
 def method_call(AST,ScopeCount,ScopeStack):
     VarName=get_identifier(AST)
-    MethodName=AST.getChildren()[0].getChildren()[1].getData()
-    print("MEthod")
-    print(MethodName)
+    MethodName=AST.getChildren()[1].getChildren()[0].getData()
+    MethodName=prebuild_method[MethodName]
+    valid_caller(VarName,MethodName,ScopeStack)
     Parameters_Node=AST.getChildren()[2]
     Parameters_given=parameters_type_func_call(Parameters_Node,ScopeStack)
     Parameters_requested=TS[MethodName]
@@ -230,8 +231,27 @@ def valid_parameter_type(requested_param,given_param):
         raise Exception("The number of params doesnt match")
     for i in range(len(requested_param)):
         for j in range(len(given_param[i])):
-            if(given_param[i][j] not in requested_param[i]):
+            focus_type=transform_value(given_param[i][j])
+            requested_params=requested_param[i]
+            if(focus_type not in requested_params):
                 raise Exception("The var params types doesnt match")
+def valid_caller(varName,MethodName,ScopeStack):
+    varType=find_var_type(varName,ScopeStack)
+    if(varType!="NOT_DEFINED"):
+        if(varType not in valid_caller_dic[MethodName]):
+            raise Exception("No valid caller Var: "+varName+"to method"+ MethodName)
+
+def transform_value(varType):
+    if(varType=="INTEGER"):
+        return 'int'
+    if(varType=="BOOLEAN"):
+        return 'bool'
+    if(varType=='LIST'):
+        return 'lista'
+    if(varType=="FLOAT"):
+        return 'float'
+    else:
+        return varType
     
 
 def prebuild_setting():

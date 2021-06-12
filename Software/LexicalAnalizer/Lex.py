@@ -43,6 +43,7 @@ t_INSTANCE=r'='
 t_METHOD_CALL_POINT=r'\.'
 t_COMA=r','
 t_COLON=r':'
+t_STRING=r'\"(.)*\"'
 
 #Some complex regex
 digit            = r'([0-9])'
@@ -75,6 +76,8 @@ def t_MAIN_FUNC(t):
 def t_PROCEDURE(t):
     r'Procedure'
     return t
+
+
 @lex.Token(boolean)
 def t_BOOLEAN(t):
     return t
@@ -462,43 +465,46 @@ def p_noiterable_float(p):
 def p_noiterable_boolean(p):
     'noiterable : BOOLEAN'
     p[0]=["BOOLEAN",p[1]]
+def p_noiterable_str(p):
+    'noiterable : STRING'
+    p[0]=["STRING",p[1]]
+
 # Error rule for syntax errors
 def p_error(p):
     print("Syntax error in line "+str(p.lineno),end="")
     print(" symbol \'"+str(p.value)+"\'")
 
- 
- # Build the parser
 
-parser = yacc.yacc()
+def compile(filename):
+     
+    # Build the parser
 
-   
-file=open("fuente.wage",'r')
-s =file.read()
-mylexer = lex.lex()
-mylexer.input(s)
+    parser = yacc.yacc()
 
-
-while True:
-    tok = mylexer.token()
-    if not tok: 
-        break 
-    #print(tok)
-
-mylexer = lex.lex()
-result = parser.parse(s,lexer=mylexer)
-if(result!=None):
-    print(result)
-   
-   
-    myTree = create_tree_from_list(result)
-    #print("_______________________________________________________________________")
-    #print(myTree)
-    program(myTree)
-    #TS=TSF(myTree)
-    #print(TS)
-    #lista = myTree.inorder()
-    #print(lista)
+    
+    file=open(filename,'r')
+    s =file.read()
+    mylexer = lex.lex()
+    mylexer.input(s)
 
 
+    while True:
+        tok = mylexer.token()
+        if not tok: 
+            break 
+        #print(tok)
+
+    mylexer = lex.lex()
+    result = parser.parse(s,lexer=mylexer)
+    if(result!=None):
+        print(result)
+        myTree = create_tree_from_list(result)
+        #print("_______________________________________________________________________")
+        #print(myTree)
+        program(myTree)
+        #TS=TSF(myTree)
+        #print(TS)
+        #lista = myTree.inorder()
+        #print(lista)
+compile("fuente.wage")
 
