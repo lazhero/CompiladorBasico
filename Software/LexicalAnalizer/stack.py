@@ -9,7 +9,7 @@ class Stack:
         else:
             First_Element=self.List[0]
             if(type(First_Element)==type(Element)):
-                self.List+=[Element]
+                self.List=[Element]+self.List
     def peek(self):
         if(self.List==[]):
             return None

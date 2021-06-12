@@ -137,8 +137,8 @@ def assignment(AST,ScopeCount,ScopeStack):
 def FOR_STATEMENT(AST,ScopeCount,ScopeStack):
     iterable=get_identifier(AST)
     source=get_identifier(AST.getChildren()[1])
-    #print(iterable)
-    #print(source)
+    print("soy el scope")
+    print(ScopeStack.stack_to_list())
     try:
         find_var_type(iterable,ScopeStack)
     except:
@@ -150,22 +150,26 @@ def FOR_STATEMENT(AST,ScopeCount,ScopeStack):
     if(varType!="lista"):
         raise Exception("The "+source+" must be a list")
     for_scope = AST.getChildren()[3]
-    #print("SOY EL SCOPE DEL FOR!")
-    return scope(for_scope,ScopeCount,ScopeStack)
+    count=scope(for_scope,ScopeCount,ScopeStack)
+    print("el scope al final del for es ")
+    print(ScopeStack.stack_to_list())
+    return count
 
 def IF_statement(AST,ScopeCount,ScopeStack):
     print(TS)
     print(ScopeStack.stack_to_list())
     iterable_name = AST.getChildren()[0].getChildren()[1].getChildren()[0].getData()
     print(iterable_name)
-    #iterable_type = find_var_type(iterable_name,ScopeStack)
-    compared_type = AST.getChildren()[0].getChildren()[2].getChildren()[0].getData()
-    #print(compared_type)
-    #if (compared_type == 'IDENTIFIER'):
-        #compared_type=
-    #    pass
-    pass
+    iterable_type = find_var_type(iterable_name,ScopeStack)
 
+    compared_type = AST.getChildren()[0].getChildren()[2].getChildren()[0].getData()
+    print(compared_type)
+    '''
+    if (compared_type == 'IDENTIFIER'):
+        compared_type=
+        pass
+    pass
+    '''
 def just_math_expression(AST,ScopeStack):
     elements=get_operands(AST.getChildren()[1])
     return  validate_expression(elements,ScopeStack)
