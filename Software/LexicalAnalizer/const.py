@@ -99,7 +99,7 @@ method_valid_params_types={
 
 }
 valid_insertion_type=[0,1]
-reserved_special_time=[ "'seg'","'min'","'mil'"]
-reserved_special_object=[ "'F'", "'C'","'M'",]
+reserved_special_time=[ '"seg"','"min"','"mil"']
+reserved_special_object=[ '"F"', '"C"','"M"',]
 
 operators=['+','*','**','/','//','-']

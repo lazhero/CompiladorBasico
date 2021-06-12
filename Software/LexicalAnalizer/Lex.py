@@ -205,7 +205,7 @@ def p_functioncall(p):
     p[0] = ["CALL_FUNC",["IDENTIFIER",p[1]],p[2]]
 def p_functioncall_reserver(p):
     'functioncall : RESERVED_FUNC Parameters'
-    p[0] = ["CALL_FUNC",p[1],p[2]]
+    p[0] = ["CALL_FUNC",["IDENTIFIER",p[1]],p[2]]
 
 def p_methodcall(p):
     'methodcall : IDENTIFIER METHOD_CALL_POINT IDENTIFIER Parameters'

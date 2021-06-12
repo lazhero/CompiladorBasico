@@ -2,8 +2,11 @@
 
 
 Procedure main(int carajo,int pene){
-   var=[FALSE,FALSE,FALSE];
-   var.shapeF("pene");
+   var=[TRUE,TRUE,TRUE];
+   var2=3;
+   var.delete(var2,1);
+   shit(2,TRUE);
+
 }
 Procedure shit(int pito,int vazquezputo){
 

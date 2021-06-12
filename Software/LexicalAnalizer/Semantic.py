@@ -1,10 +1,14 @@
 from ast import Raise
+import re
 from descriptors import function_descriptor
 from const import reserved_function_names as prebuild
 from const import reserved_function_params as reserved_params
 from const import reserved_methods_names as prebuild_method
 from const import method_valid_params_types as reserverd_method_params
 from const import method_valid_caller as valid_caller_dic
+from const import reserved_special_time as special_time
+from const import reserved_special_object as special_object
+from const import valid_insertion_type as special_insertion
 from const import operators
 from stack import Stack
 
@@ -48,7 +52,6 @@ def process_children(AST,Scope_Count,Scope_Stack):
 def statement_classifier(statement,ScopeCount,ScopeStack):
 
     StatementName=statement.getData()
-    print(StatementName)
     if (StatementName==SCOPE):
         return scope(statement,ScopeCount,ScopeStack)
     if(StatementName==ASSIGNMENT):
@@ -73,11 +76,14 @@ def scope(AST,ScopeCount,ScopeStack):
 
 def function_call(AST,ScopeCount,ScopeStack):
     FunctionName=get_identifier(AST)
-    print(FunctionName)
+    if(FunctionName in prebuild):
+        FunctionName=prebuild[FunctionName]
     Parameters_Node=AST.getChildren()[1]
     Parameters_given=parameters_type_func_call(Parameters_Node,ScopeStack)
     Parameters_requested=TS[FunctionName]
+    Parameters_values=parameters_value_func_call(Parameters_Node,ScopeStack)
     valid_parameter_type(Parameters_requested,Parameters_given)
+    evaluate_special_string(Parameters_requested,Parameters_values)
     return ScopeCount
 
 def method_call(AST,ScopeCount,ScopeStack):
@@ -88,7 +94,9 @@ def method_call(AST,ScopeCount,ScopeStack):
     Parameters_Node=AST.getChildren()[2]
     Parameters_given=parameters_type_func_call(Parameters_Node,ScopeStack)
     Parameters_requested=TS[MethodName]
+    Parameters_values=parameters_value_func_call(Parameters_Node,ScopeStack)
     valid_parameter_type(Parameters_requested,Parameters_given)
+    evaluate_special_string(Parameters_requested,Parameters_values)
     return ScopeCount
 def assignment(AST,ScopeCount,ScopeStack):
     element_classifier=AST.getChildren()[1].getData()
@@ -213,7 +221,43 @@ def parameters_type_func_call(AST,ScopeStack):
         else:
             Parameters+=[[ParameterType]]
     return Parameters
+def parameters_value_func_call(AST,ScopeStack):
+    Parameters=[]
+    for Parameter in AST.getChildren():
+        ParameterValue=Parameter.getChildren()[0].getData()
+        Parameters+=[ParameterValue]
+    return Parameters
+def evaluate_special_string(requestedParameters,givenValues):
+    current_types=None
+    current_value=None
+    current_type=None
+    for i in range(len(requestedParameters)):
+        current_types=requestedParameters[i]
+        current_value=givenValues[i]
+        if(len(current_types)==1):
+            current_type=current_types[0]
+            match_special_types(current_type,current_value)
+            
+    
 
+def match_special_types(varType,value):
+    if(varType=="RESERVERD_SPECIAL_TIME"):
+        if(value not in special_time):
+            special_type_exception(value,varType)
+    if(varType=="RESERVED_SPECIAL_OBJECT"):
+        if(value not in special_object):
+            special_type_exception(value,varType)
+    if(varType=='valid_insertion'):
+        if(value not in special_insertion):
+            special_type_exception(value,varType)
+    
+
+
+
+
+def special_type_exception(value,varType):
+    raise Exception("The "+str(value)+" doesnt match with the "+varType+" requested")
+        
 def getParamstypes(AST,ScopeStack):
     datatype=""
     typeslist=[]
@@ -226,20 +270,29 @@ def getParamstypes(AST,ScopeStack):
         except:
             return []
     return typeslist
+
+
 def valid_parameter_type(requested_param,given_param):
+    print("given param")
+    print(given_param)
     if(len(requested_param)!=len(given_param)):
         raise Exception("The number of params doesnt match")
     for i in range(len(requested_param)):
         for j in range(len(given_param[i])):
             focus_type=transform_value(given_param[i][j])
             requested_params=requested_param[i]
+            print(requested_params)
+            if(focus_type=="STRING"):
+                continue
+            if('valid_insertion'== requested_params[0]):
+                continue
             if(focus_type not in requested_params):
                 raise Exception("The var params types doesnt match")
 def valid_caller(varName,MethodName,ScopeStack):
     varType=find_var_type(varName,ScopeStack)
     if(varType!="NOT_DEFINED"):
         if(varType not in valid_caller_dic[MethodName]):
-            raise Exception("No valid caller Var: "+varName+"to method"+ MethodName)
+            raise Exception("No valid caller "+varName+" to method "+ MethodName)
 
 def transform_value(varType):
     if(varType=="INTEGER"):
