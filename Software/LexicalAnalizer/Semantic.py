@@ -24,6 +24,8 @@ FUNCTIONCALL="CALL_FUNC"
 SCOPE="SCOPE"
 FOR="FOR"
 IF="IF"
+def SEMANTIC(AST):
+    program(AST)
 
 def program(AST):
     MAIN_FLAG=True

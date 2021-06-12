@@ -5,7 +5,7 @@
  # numbers and +,-,*,/
  # ------------------------------------------------------------
 
-from Semantic import program
+
 from tokenize import Token
 import ply.lex as lex
 import ply.yacc as yacc
@@ -17,7 +17,7 @@ from const import reserved_function_names
 from const import reserved_methods_names
 from m_tree import *
 from TS import TS_FROM_m_tree as TSF
-from Semantic import program
+
  
  # List of token names.   This is always required
 
@@ -480,36 +480,22 @@ def p_error(p):
     print(" symbol \'"+str(p.value)+"\'")
 
 
-def compile(filename):
-     
-    # Build the parser
-
+def lex_syntx(filename):
     parser = yacc.yacc()
-
-    
     file=open(filename,'r')
     s =file.read()
     mylexer = lex.lex()
     mylexer.input(s)
-
-
     while True:
         tok = mylexer.token()
         if not tok: 
             break 
-        #print(tok)
-
     mylexer = lex.lex()
     result = parser.parse(s,lexer=mylexer)
+    myTree=None
     if(result!=None):
         print(result)
         myTree = create_tree_from_list(result)
-        #print("_______________________________________________________________________")
-        #print(myTree)
-        program(myTree)
-        #TS=TSF(myTree)
-        #print(TS)
-        #lista = myTree.inorder()
-        #print(lista)
-compile("fuente.wage")
+    return myTree
+
 
