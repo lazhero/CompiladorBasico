@@ -245,13 +245,13 @@ def p_statement_iteracionstep(p):
     p[0]=["FOR",["IDENTIFIER",p[2]],["IN",p[4]],["STEP",["INTEGER",p[6]]],p[7]]
 def p_statement_iteracion_step_integer(p):
     'statement : FOR IDENTIFIER IN INTEGER STEP INTEGER scope'
-    p[0]=["FOR",["IDENTIFIER",p[2]],["IN",["INTEGER",p[4]]],["STEP",p[6]],p[7]]
+    p[0]=["FOR",["IDENTIFIER",p[2]],["IN",["INTEGER",p[4]]],["STEP",["INTEGER",p[6]]],p[7]]
 def p_statement_iteracion(p):
     'statement : FOR IDENTIFIER IN iterable scope'
-    p[0]=["FOR",["IDENTIFIER",p[2]],["IN",p[4]],["STEP",1],p[5]]
+    p[0]=["FOR",["IDENTIFIER",p[2]],["IN",p[4]],["STEP",["INTEGER",1]],p[5]]
 def p_statement_iteracion_integer(p):
     'statement : FOR IDENTIFIER IN INTEGER scope'
-    p[0]=["FOR",["IDENTIFIER",p[2]],["IN",["INTEGER",p[4]]],["STEP",1],p[5]]
+    p[0]=["FOR",["IDENTIFIER",p[2]],["IN",["INTEGER",p[4]]],["STEP",["INTEGER",1]],p[5]]
 def p_statement_assign_math(p):
     'statement : IDENTIFIER INSTANCE expression EOL'
     p[0]=["ASSIGMENT",["IDENTIFIER",p[1]],p[3]]

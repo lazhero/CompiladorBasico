@@ -5,7 +5,10 @@ Procedure main(int carajo,int pene){
    var=[TRUE,TRUE,TRUE];
    var2=3;
    var.delete(var2,1);
-   shit(2,TRUE);
+   julian=2;
+   for ratanas in julian Step 3{
+      
+   }
 
 }
 Procedure shit(int pito,int vazquezputo){

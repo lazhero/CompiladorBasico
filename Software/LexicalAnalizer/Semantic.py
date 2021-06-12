@@ -22,6 +22,8 @@ ASSIGNMENT="ASSIGMENT"
 METHODCALL="METHOD_CALL"
 FUNCTIONCALL="CALL_FUNC"
 SCOPE="SCOPE"
+FOR="FOR"
+IF="IF"
 
 def program(AST):
     MAIN_FLAG=True
@@ -60,6 +62,10 @@ def statement_classifier(statement,ScopeCount,ScopeStack):
         return method_call(statement,ScopeCount,ScopeStack)
     if(StatementName==FUNCTIONCALL):
         return function_call(statement,ScopeCount,ScopeStack)
+    if(StatementName==FOR):
+        return FOR_STATEMENT(statement,ScopeCount,ScopeStack)
+    if(StatementName==IF):
+        pass
     else:
         return ScopeCount
 
@@ -127,7 +133,25 @@ def assignment(AST,ScopeCount,ScopeStack):
     else:
         raise Exception("The "+varName+"'s type has changed")
     return ScopeCount
-  
+def FOR_STATEMENT(AST,ScopeCount,ScopeStack):
+    print("llegue al for perras")
+    iterable=get_identifier(AST)
+    source=get_identifier(AST.getChildren()[1])
+    print(iterable)
+    print(source)
+    try:
+        find_var_type(iterable,ScopeStack)
+    except:
+        var_to_TS(ScopeStack,iterable,"bool")
+    else:
+        print("llegue aqui")
+        raise Exception("The "+iterable+ " has been defined previously")
+    varType=find_var_type(source,ScopeStack)
+    if(varType!="lista"):
+        raise Exception("The "+source+" must be a list")
+    return ScopeCount
+
+
 def just_math_expression(AST,ScopeStack):
     elements=get_operands(AST.getChildren()[1])
     return  validate_expression(elements,ScopeStack)
