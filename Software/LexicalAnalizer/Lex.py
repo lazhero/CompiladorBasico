@@ -193,7 +193,7 @@ def p_statement_scope(p):
     p[0]=p[1]
 def p_statement_conditional(p):
     'statement : IF conditional scope'
-    p[0]=[p[1],p[2],p[3]]
+    p[0]=['IF',p[2],p[3],['ELSE',[]]]
 def p_statement_functioncall(p):
     'statement : functioncall EOL'
     p[0]=p[1]
@@ -234,11 +234,16 @@ def p_methodcall_list_reserved_2(p):
 
 def p_statement_conditional_else(p):
     'statement : IF conditional scope ELSE scope'
-    p[0]=["IF",p[2],p[3],p[4],p[5]]
+    p[0]=["IF",p[2],p[3],['ELSE',p[5]]]
 
-def p_conditional(p):
+def p_conditional_iterable(p):
+    'conditional : IDENTIFIER COMPARATOR iterable'
+    p[0]= ["CONDITION",["COMPARATOR",p[2]], ["IDENTIFIER",p[1]], p[3]]
+
+def p_conditional_noiterable(p):
     'conditional : IDENTIFIER COMPARATOR noiterable'
-    p[0]= ["CONDITIONAL",["COMPARATOR",p[2]], ["IDENTIFIER",p[1]], p[3]]
+    p[0]= ["CONDITION",["COMPARATOR",p[2]], ["IDENTIFIER",p[1]], p[3]]
+
 
 def p_statement_iteracionstep(p):
     'statement : FOR IDENTIFIER IN iterable STEP INTEGER scope'

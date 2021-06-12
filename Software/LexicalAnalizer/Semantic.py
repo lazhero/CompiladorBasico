@@ -52,7 +52,6 @@ def process_children(AST,Scope_Count,Scope_Stack):
     return Scope_Count
 
 def statement_classifier(statement,ScopeCount,ScopeStack):
-
     StatementName=statement.getData()
     if (StatementName==SCOPE):
         return scope(statement,ScopeCount,ScopeStack)
@@ -65,7 +64,7 @@ def statement_classifier(statement,ScopeCount,ScopeStack):
     if(StatementName==FOR):
         return FOR_STATEMENT(statement,ScopeCount,ScopeStack)
     if(StatementName==IF):
-        pass
+        return IF_statement(statement,ScopeCount,ScopeStack)
     else:
         return ScopeCount
 
@@ -104,6 +103,7 @@ def method_call(AST,ScopeCount,ScopeStack):
     valid_parameter_type(Parameters_requested,Parameters_given)
     evaluate_special_string(Parameters_requested,Parameters_values)
     return ScopeCount
+
 def assignment(AST,ScopeCount,ScopeStack):
     element_classifier=AST.getChildren()[1].getData()
     varName=AST.getChildren()[0].getChildren()[0].getData()
@@ -133,24 +133,38 @@ def assignment(AST,ScopeCount,ScopeStack):
     else:
         raise Exception("The "+varName+"'s type has changed")
     return ScopeCount
+
 def FOR_STATEMENT(AST,ScopeCount,ScopeStack):
-    print("llegue al for perras")
     iterable=get_identifier(AST)
     source=get_identifier(AST.getChildren()[1])
-    print(iterable)
-    print(source)
+    #print(iterable)
+    #print(source)
     try:
         find_var_type(iterable,ScopeStack)
     except:
         var_to_TS(ScopeStack,iterable,"bool")
     else:
-        print("llegue aqui")
+        #print("llegue aqui")
         raise Exception("The "+iterable+ " has been defined previously")
     varType=find_var_type(source,ScopeStack)
     if(varType!="lista"):
         raise Exception("The "+source+" must be a list")
-    return ScopeCount
+    for_scope = AST.getChildren()[3]
+    #print("SOY EL SCOPE DEL FOR!")
+    return scope(for_scope,ScopeCount,ScopeStack)
 
+def IF_statement(AST,ScopeCount,ScopeStack):
+    print(TS)
+    print(ScopeStack.stack_to_list())
+    iterable_name = AST.getChildren()[0].getChildren()[1].getChildren()[0].getData()
+    print(iterable_name)
+    #iterable_type = find_var_type(iterable_name,ScopeStack)
+    compared_type = AST.getChildren()[0].getChildren()[2].getChildren()[0].getData()
+    #print(compared_type)
+    #if (compared_type == 'IDENTIFIER'):
+        #compared_type=
+    #    pass
+    pass
 
 def just_math_expression(AST,ScopeStack):
     elements=get_operands(AST.getChildren()[1])
@@ -297,15 +311,15 @@ def getParamstypes(AST,ScopeStack):
 
 
 def valid_parameter_type(requested_param,given_param):
-    print("given param")
-    print(given_param)
+    #print("given param")
+    #print(given_param)
     if(len(requested_param)!=len(given_param)):
         raise Exception("The number of params doesnt match")
     for i in range(len(requested_param)):
         for j in range(len(given_param[i])):
             focus_type=transform_value(given_param[i][j])
             requested_params=requested_param[i]
-            print(requested_params)
+            #print(requested_params)
             if(focus_type=="STRING"):
                 continue
             if('valid_insertion'== requested_params[0]):

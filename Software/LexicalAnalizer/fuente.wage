@@ -1,19 +1,18 @@
- 
-
-
 Procedure main(int carajo,int pene){
    var=[TRUE,TRUE,TRUE];
    var2=3;
    var.delete(var2,1);
    julian=2;
-   for ratanas in julian Step 3{
+   for var14 in var Step 2{
       
+   }
+   if var2==var{
+   }
+   else{
    }
 
 }
-Procedure shit(int pito,int vazquezputo){
 
-}
 
 
 
