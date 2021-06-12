@@ -73,9 +73,11 @@ class ScrollText(tk.Frame):
         root.title("New File - Wage IDE")
         global open_file_name
         open_file_name = False
+    def root_path(self):
+        return os.path.abspath(os.sep)
 
     def open_file(self,e):
-        text_file = filedialog.askopenfilename(initialdir="C:/", title="Open File", filetypes=(("Text Files", "*.txt"), ("Python Files", "*.py"), ("Wage Files", "*.wage"), ("All Files", "*.*")))
+        text_file = filedialog.askopenfilename(initialdir=self.root_path(), title="Open File", filetypes=(("Wage Files", "*.wage"),("Text Files", "*.txt"), ("Python Files", "*.py"),  ("All Files", "*.*")))
         if text_file:
             global open_file_name
             open_file_name = text_file
@@ -88,7 +90,7 @@ class ScrollText(tk.Frame):
             text_file.close()
             
     def save_as_file(self,e):
-        text_file = filedialog.asksaveasfilename(defaultextension=".*", initialdir="C:/", title="Save File", filetypes=(("Text Files", "*.txt"), ("Python Files", "*.py"), ("Wage Files", "*.wage"), ("All Files", "*.*")))
+        text_file = filedialog.asksaveasfilename(defaultextension=".*", initialdir=self.root_path(), title="Save File", filetypes=(("Wage Files", "*.wage"),("Text Files", "*.txt"), ("Python Files", "*.py"),  ("All Files", "*.*")))
         name = text_file
         if text_file:
             text_file = open(text_file, 'w')
@@ -110,7 +112,7 @@ class ScrollText(tk.Frame):
         if open_file_name:
             code_output = Text(height=10)
             code_output.pack()
-            command = f'python {open_file_name}'
+            command = command = ["python","compile.py","compile",open_file_name]
             process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
             output, error = process.communicate()
             code_output.insert('1.0', output)
