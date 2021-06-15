@@ -1,8 +1,10 @@
 import time
+import threading
 from pyfirmata2 import Arduino, util, OUTPUT
 
 class Arduino_Controller:
     board = Arduino('COM3')
+    Flag = True
     d_pin_2 = board.get_pin('d:2:o')
     d_pin_3 = board.get_pin('d:3:o')
     d_pin_4 = board.get_pin('d:4:o')
@@ -57,16 +59,13 @@ class Arduino_Controller:
             self.columns[i].write(1)
 
     def display(self):
-        counter = 0
-        while counter < 100:
+        while self.Flag:
             for i in range(0, 8):
                 self.columns[i].write(0)
                 for j in range(0, 8):
-                    self.rows[j].write(self.matrix[j][i])
-                time.sleep(0.0001)
+                    self.rows[j].write(self.matrix[j][i]) 
                 self.clear()
-            counter += 1
-        self.clear()
+            self.clear()
 
     def change_matrix(self, new_matrix):
         self.fill_matrix(new_matrix)
@@ -123,7 +122,28 @@ class Arduino_Controller:
         else:
             return False
 
+    def change_flag(self):
+        if self.Flag == True:
+            self.Flag = False
+        else:
+            self.Flag = True
 
+    def time_to_sec(self, time, time_unit):
+        if time_unit == "Seg":
+            return time
+        elif time_unit == "Mil":
+            return time/1000
+        elif time_unit == "Min":
+            return time*60
+
+    def blink(self, Data, time, time_unit, state):
+        time_used = self.time_to_sec(time, time_unit)
+        if state == True:
+            pass
+        return False
+    def create_blink_thread():
+        thread = threading.Thread(target= Arduino_cont.display, args = ())
+        thread.start()
 Arduino_cont = Arduino_Controller()
 Arduino_cont.clear()
 '''
@@ -137,5 +157,20 @@ Arduino_cont.change_matrix(
               [0, 0, 1, 1, 1, 1, 0, 0],
               [0, 0, 0, 0, 0, 0, 0, 0]])
 '''
-Arduino_cont.display()
+thread = threading.Thread(target= Arduino_cont.display, args = ())
+thread.start()
 
+time.sleep(5)
+
+Arduino_cont.change_matrix(
+             [[0, 0, 0, 0, 0, 0, 0, 0],
+              [0, 0, 1, 0, 0, 1, 0, 0],
+              [0, 0, 1, 0, 0, 1, 0, 0],
+              [0, 0, 1, 0, 0, 1, 0, 0],
+              [0, 0, 0, 0, 0, 0, 0, 0],
+              [0, 1, 0, 0, 0, 0, 1, 0],
+              [0, 0, 1, 1, 1, 1, 0, 0],
+              [0, 0, 0, 0, 0, 0, 0, 0]])
+var = input("toca una tecla, para finalizar")
+Arduino_cont.change_flag()
+thread.join()
