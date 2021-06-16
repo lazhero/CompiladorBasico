@@ -90,7 +90,7 @@ def function_call(AST,ScopeCount,ScopeStack):
     Parameters_given=parameters_type_func_call(Parameters_Node,ScopeStack)
     Parameters_requested=TS[FunctionName]
     Parameters_values=parameters_value_func_call(Parameters_Node,ScopeStack)
-    valid_parameter_type(Parameters_requested,Parameters_given)
+    valid_parameter_type(Parameters_requested,Parameters_given,FunctionName)
     evaluate_special_string(Parameters_requested,Parameters_values)
     return ScopeCount
 
@@ -103,7 +103,7 @@ def method_call(AST,ScopeCount,ScopeStack):
     Parameters_given=parameters_type_func_call(Parameters_Node,ScopeStack)
     Parameters_requested=TS[MethodName]
     Parameters_values=parameters_value_func_call(Parameters_Node,ScopeStack)
-    valid_parameter_type(Parameters_requested,Parameters_given)
+    valid_parameter_type(Parameters_requested,Parameters_given,MethodName)
     evaluate_special_string(Parameters_requested,Parameters_values)
     return ScopeCount
 
@@ -140,22 +140,20 @@ def assignment(AST,ScopeCount,ScopeStack):
 def FOR_STATEMENT(AST,ScopeCount,ScopeStack):
     iterable=get_identifier(AST)
     source=get_identifier(AST.getChildren()[1])
-    print("soy el scope")
-    print(ScopeStack.stack_to_list())
+    #print(ScopeStack.stack_to_list())
     try:
         find_var_type(iterable,ScopeStack)
     except:
         var_to_TS(ScopeStack,iterable,"bool")
     else:
-        #print("llegue aqui")
-        raise Exception("The "+iterable+ " has been defined previously")
+        raise Exception("The variable "+iterable+ " has been defined previously")
     varType=find_var_type(source,ScopeStack)
     if(varType!="lista"):
         raise Exception("The "+source+" must be a list")
     for_scope = AST.getChildren()[3]
     count=scope(for_scope,ScopeCount,ScopeStack)
-    print("el scope al final del for es ")
-    print(ScopeStack.stack_to_list())
+    #print("el scope al final del for es ")
+    #print(ScopeStack.stack_to_list())
     return count
 
 def IF_statement(AST,ScopeCount,ScopeStack):
@@ -163,11 +161,12 @@ def IF_statement(AST,ScopeCount,ScopeStack):
     iterable_type = find_var_type(iterable_name,ScopeStack)
     compared_value = AST.getChildren()[0].getChildren()[2].getChildren()[0].getData()
     compared_type=AST.getChildren()[0].getChildren()[2].getData()
-    print(iterable_name)
-    print(iterable_type)
-    print(compared_type)
-    print(compared_value)
+    #print(iterable_name)
+    #print(iterable_type)
+    #print(compared_type)
+    #print(compared_value)
     if_scope=AST.getChildren()[1]
+    print(AST.getChildren()[2].getChildren())
     else_scope=AST.getChildren()[2].getChildren()[0]
     if (compared_type == 'IDENTIFIER'):
         compared_type=find_var_type(compared_value,ScopeStack)
@@ -321,11 +320,11 @@ def getParamstypes(AST,ScopeStack):
     return typeslist
 
 
-def valid_parameter_type(requested_param,given_param):
+def valid_parameter_type(requested_param,given_param, name):
     #print("given param")
     #print(given_param)
     if(len(requested_param)!=len(given_param)):
-        raise Exception("The number of params doesnt match")
+        raise Exception("The number of params in "+name+" doesnt match")
     for i in range(len(requested_param)):
         for j in range(len(given_param[i])):
             focus_type=transform_value(given_param[i][j])
@@ -336,7 +335,8 @@ def valid_parameter_type(requested_param,given_param):
             if('valid_insertion'== requested_params[0]):
                 continue
             if(focus_type not in requested_params):
-                raise Exception("The var params types doesnt match")
+                raise Exception("The var params types in "+name+"  doesnt match")
+
 def valid_caller(varName,MethodName,ScopeStack):
     varType=find_var_type(varName,ScopeStack)
     if(varType!="NOT_DEFINED"):

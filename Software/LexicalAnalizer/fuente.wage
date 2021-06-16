@@ -8,7 +8,7 @@ Procedure main(int carajo,int pene){
       if var2<24{
          x=3.24;
       }
-      if var2==FALSE{
+      if var2==2{
 
       }
       else{
@@ -16,16 +16,21 @@ Procedure main(int carajo,int pene){
       }
    }
    if var2==var4{
+      var5234 =5;
    }
    else{
    }
 
 }
-Procedure basquest(int carajo,int pene){
-
-
+Procedure pitppito1(int p,int y, bool asd,lista cosas){
+   var =  [[TRUE],[FALSE],[TRUE],[FALSE],[[TRUE],[[TRUE]]]];
+   var2 = 12934671;
+   var3 = var[4][1][1];
+   var4 = FALSE;
+   var5 = var3;
+   var3 = var[4][1][1][1][1][1][1];
+   main(var2,5);
 }
-
 
 
 

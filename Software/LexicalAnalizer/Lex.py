@@ -193,7 +193,7 @@ def p_statement_scope(p):
     p[0]=p[1]
 def p_statement_conditional(p):
     'statement : IF conditional scope'
-    p[0]=['IF',p[2],p[3],['ELSE',[]]]
+    p[0]=['IF',p[2],p[3],['ELSE',["SCOPE"]]]
 def p_statement_functioncall(p):
     'statement : functioncall EOL'
     p[0]=p[1]
@@ -497,7 +497,7 @@ def lex_syntx(filename):
     result = parser.parse(s,lexer=mylexer)
     myTree=None
     if(result!=None):
-        print(result)
+        #print(result)
         myTree = create_tree_from_list(result)
     if(len(Syntax_errors)>0):
         print(Syntax_errors)

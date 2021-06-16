@@ -30,7 +30,9 @@ def create_tree_from_list(lista):
     else:
         Sons=[]
         for i in lista[1:]:
-            Sons+=[create_tree_from_list(i)]
+            son=create_tree_from_list(i)
+            if (son != None):
+                Sons+=[son]
         Tree=m_node(lista[0],Sons)
         return Tree
 
