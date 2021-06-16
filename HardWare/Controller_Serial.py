@@ -31,6 +31,23 @@ class Led_Matrix:
             col = new_matrix%8
             res_matrix[row][col] = 1
         return res_matrix
+    def fill_matrix_aux_val(self, new_matrix,value):
+        res_matrix = []
+        # makes the res_matrix an 8x8 matrix
+        for i in range(0, 8):
+            res_matrix.append([0, 0, 0, 0, 0, 0, 0, 0])
+        
+        # fills the res_matrix with the corresponding data
+        if self.is_valid_matrix(new_matrix):
+            for i in range(0, len(new_matrix)):
+                for j in range(0, len(new_matrix[0])):
+                    res_matrix[i][j] = new_matrix[i][j]
+        #fills the res_matrix with the only led to write to
+        else:
+            row = new_matrix//8
+            col = new_matrix%8
+            res_matrix[row][col] = value
+        return res_matrix
 
     def fill_matrix(self, new_matrix):
         if self.is_valid_matrix(new_matrix):
@@ -43,6 +60,20 @@ class Led_Matrix:
                 raise Exception("ERROR, MATRIZ NO ES VALIDA")
             else:
                 return self.fill_matrix_aux(new_matrix)
+        else:
+            raise Exception("ERROR, MATRIZ NO ES VALIDA")
+    
+    def fill_matrix_val(self, new_matrix, value):
+        if self.is_valid_matrix(new_matrix):
+            if len(new_matrix) < 8 or len(new_matrix[0]) < 8:
+                return self.fill_matrix_aux_val(new_matrix)
+            else:
+                return new_matrix
+        if isinstance(new_matrix,int):
+            if new_matrix>64 or new_matrix<0:
+                raise Exception("ERROR, MATRIZ NO ES VALIDA")
+            else:
+                return self.fill_matrix_aux_val(new_matrix,value)
         else:
             raise Exception("ERROR, MATRIZ NO ES VALIDA")
 
@@ -113,7 +144,7 @@ def write_matrix_to_arduino(matrix):
         serial_port.write(msg.encode('ascii'))
         data_rec = serial_port.readline().decode('ascii')
     
-def blink(data, time, time_unit, state):
+def BLINK(data, time, time_unit, state):
     helper = Led_Matrix()
     matrix_to_send = helper.fill_matrix(data)
     msg = "blink,"+str(time)+","
@@ -136,15 +167,49 @@ def blink(data, time, time_unit, state):
     write_matrix_to_arduino(matrix_to_send)
     serial_port.write(msg.encode('ascii'))
 
-def delay(time, time_unit):
-    time = 
+def DELAY(_time, time_unit):
+    if time_unit == "Seg":
+        time.sleep(_time)
+    elif time_unit == "Min":
+        time.sleep(_time*60)
+    elif time_unit == "Mil":
+        time.sleep(_time/1000)
+    else:
+        raise Exception("NOT VALID TIME_UNIT")
 
 def NEG(data):
-    return  
+    if isinstance(data, bool):
+        if data == True:
+            return False
+        return True
+    elif isinstance(data, list):
+        res = []
+        for element in data:
+            if element == True:
+                res.append(False)
+            else:
+                res.append(True)
+        return res
+
+def PRINT_LED(col, row, value):
+    index = row*8+col
+    helper = Led_Matrix()
+    if value == True:
+        mat_to_send = helper.fill_matrix_val(index, 1)
+    elif value == False:
+        mat_to_send = helper.fill_matrix_val(index, 0)
+    else:
+        raise Exception("Value is not valid")
+    write_matrix_to_arduino(mat_to_send)
+    
+def PRINT_LEDX(type,index,values):
+    helper = Led_Matrix()
+    if type == "C":
+        mat_to_send = helper.fill_matrix_val(0,False)
 
 
 def test():
-    blink(55,1000,"Mil",True)
-    
+    BLINK(55,1000,"Mil",True)
 
-test()
+helper = Led_Matrix()
+print(helper.fill_matrix_val(0,0))
