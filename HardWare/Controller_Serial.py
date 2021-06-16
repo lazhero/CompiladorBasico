@@ -136,6 +136,13 @@ def blink(data, time, time_unit, state):
     write_matrix_to_arduino(matrix_to_send)
     serial_port.write(msg.encode('ascii'))
 
+def delay(time, time_unit):
+    time = 
+
+def NEG(data):
+    return  
+
+
 def test():
     blink(55,1000,"Mil",True)
     
