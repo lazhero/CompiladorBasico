@@ -40,11 +40,12 @@ FunctionDataSetters={
 }
 
 reserved = {
-    'if'    : 'IF',
-    'else'  : 'ELSE',
-    'for'   : 'FOR',
-    'in'    : 'IN',
-    'Step'  : 'STEP',
+    'if'      : 'IF',
+    'else'    : 'ELSE',
+    'for'     : 'FOR',
+    'in'      : 'IN',
+    'Step'    : 'STEP',
+    'uniquei' : 'UNIQUEI'
  }
 reserved_function_names={
     'blink'      : 'BLINK',
@@ -89,7 +90,7 @@ method_valid_caller={
     'DELETE'  : ['lista'],
 }
 method_valid_params_types={
-    'INSERT':[['list'],['valid_insertion'],['int']],
+    'INSERT':[['lista'],['valid_insertion'],['int']],
     'DELETE':[['int'],['valid_insertion']],
     'F_METHOD':[],
     'T_METHOD':[],

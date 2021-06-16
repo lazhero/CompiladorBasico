@@ -1,37 +1,13 @@
 Procedure main(int carajo,int pene){
-   var=[TRUE,TRUE,TRUE];
-   var2=3;
-   var4=2;
-   var.delete(var2,1);
-   julian=2;
-   for var14 in var Step 2{
-      if var2<24{
-         x=3.24;
-      }
-      if var2==2{
-
-      }
-      else{
-         x=2.89;
-      }
-   }
-   if var2==var4{
-      var5234 =5;
+   milista=[True,False];
+   x=3;
+   if x>5{
+      x=4;
    }
    else{
+      x=2;
    }
-
 }
-Procedure pitppito1(int p,int y, bool asd,lista cosas){
-   var =  [[TRUE],[FALSE],[TRUE],[FALSE],[[TRUE],[[TRUE]]]];
-   var2 = 12934671;
-   var3 = var[4][1][1];
-   var4 = FALSE;
-   var5 = var3;
-   var3 = var[4][1][1][1][1][1][1];
-   main(var2,5);
-}
-
 
 
 

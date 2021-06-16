@@ -12,10 +12,12 @@ from const import valid_insertion_type as special_insertion
 from const import operators
 from stack import Stack
 
-global TS,MAIN_FLAG
+global TS,MAIN_FLAG, GENERATED, TABCOUNTER
 MAIN_FLAG=False
 
+
 TS={} #Table Symbol
+
 ARGUMENTS="ARGUMENTS"
 PARAMETERS="PARAMETERS"
 ASSIGNMENT="ASSIGMENT"
@@ -24,7 +26,12 @@ FUNCTIONCALL="CALL_FUNC"
 SCOPE="SCOPE"
 FOR="FOR"
 IF="IF"
-def SEMANTIC(AST):
+OUTPUTFILE="out.py"
+def SEMANTIC(AST,path):
+    global GENERATED, TABCOUNTER
+    GENERATED=open(path+"/"+OUTPUTFILE,"w")
+    TABCOUNTER=0
+
     program(AST)
 
 def program(AST):
@@ -34,19 +41,23 @@ def program(AST):
         raise Exception("No main found")
     for i in AST.getChildren():
         procedure(i)
-    #print(TS)
 
 def procedure(AST):
     global MAIN_FLAG
     Scope_Stack=Stack()
-    Scope_Stack.push(get_identifier(AST))
+    proc_name=get_identifier(AST)
+    Scope_Stack.push(proc_name)
     if(get_identifier(AST)=="main"):
         MAIN_FLAG=False
     Scope_Count=0
+    GENERATED.write("def ")
+    GENERATED.write(proc_name)
+    params=getParamsNames(AST)
+    writeParameters(params,"(",")")
+    GENERATED.write(":\n")
     process_children(AST,Scope_Count,Scope_Stack)
 
 def process_children(AST,Scope_Count,Scope_Stack):
-    #print()
     children=AST.getChildren()
     if(AST.getData()=="PROCEDURE"):
         children=children[1:]
@@ -72,14 +83,16 @@ def statement_classifier(statement,ScopeCount,ScopeStack):
         return ScopeCount
 
 def scope(AST,ScopeCount,ScopeStack):
-    global MAIN_FLAG
+    global MAIN_FLAG, TABCOUNTER
     if(MAIN_FLAG):
         ScopeStack.push("SCOPE"+str(ScopeCount))
     else:
         MAIN_FLAG=True
     ScopeCount += 1
+    TABCOUNTER += 1
     ScopeCount = process_children(AST,ScopeCount,ScopeStack)
     ScopeStack.pop()
+    TABCOUNTER -= 1
     return ScopeCount
 
 def function_call(AST,ScopeCount,ScopeStack):
@@ -92,6 +105,11 @@ def function_call(AST,ScopeCount,ScopeStack):
     Parameters_values=parameters_value_func_call(Parameters_Node,ScopeStack)
     valid_parameter_type(Parameters_requested,Parameters_given,FunctionName)
     evaluate_special_string(Parameters_requested,Parameters_values)
+
+    GENERATED.write((TABCOUNTER*"\t")+FunctionName)
+    writeParameters(Parameters_values,"(",")")
+    GENERATED.write("\n")
+
     return ScopeCount
 
 def method_call(AST,ScopeCount,ScopeStack):
@@ -105,6 +123,12 @@ def method_call(AST,ScopeCount,ScopeStack):
     Parameters_values=parameters_value_func_call(Parameters_Node,ScopeStack)
     valid_parameter_type(Parameters_requested,Parameters_given,MethodName)
     evaluate_special_string(Parameters_requested,Parameters_values)
+    
+    GENERATED.write((TABCOUNTER*"\t")+MethodName)
+    params=[VarName]+Parameters_values
+    writeParameters(params,"(",")")
+    GENERATED.write("\n")
+
     return ScopeCount
 
 def assignment(AST,ScopeCount,ScopeStack):
@@ -135,12 +159,18 @@ def assignment(AST,ScopeCount,ScopeStack):
         var_to_TS(ScopeStack,varName,final_type)
     else:
         raise Exception("The "+varName+"'s type has changed")
+    writeType=assign_type
+    if(element_classifier in operators):
+        writeType="MATH"
+    
+    GENERATED.write((TABCOUNTER*"\t")+varName+"=")
+    writeAssignment(AST,writeType)
+    GENERATED.write("\n")
     return ScopeCount
 
 def FOR_STATEMENT(AST,ScopeCount,ScopeStack):
     iterable=get_identifier(AST)
     source=get_identifier(AST.getChildren()[1])
-    #print(ScopeStack.stack_to_list())
     try:
         find_var_type(iterable,ScopeStack)
     except:
@@ -151,9 +181,12 @@ def FOR_STATEMENT(AST,ScopeCount,ScopeStack):
     if(varType!="lista"):
         raise Exception("The "+source+" must be a list")
     for_scope = AST.getChildren()[3]
+    step=AST.getChildren()[2].getChildren()[0].getChildren()[0].getData()
+    GENERATED.write((TABCOUNTER*"\t")+"for ")
+    GENERATED.write("uniquei in range(0,len("+source+"),"+str(step)+"):\n")
+    GENERATED.write((TABCOUNTER+1)*"\t")
+    GENERATED.write(iterable+"="+source+"[uniquei]\n")
     count=scope(for_scope,ScopeCount,ScopeStack)
-    #print("el scope al final del for es ")
-    #print(ScopeStack.stack_to_list())
     return count
 
 def IF_statement(AST,ScopeCount,ScopeStack):
@@ -161,10 +194,6 @@ def IF_statement(AST,ScopeCount,ScopeStack):
     iterable_type = find_var_type(iterable_name,ScopeStack)
     compared_value = AST.getChildren()[0].getChildren()[2].getChildren()[0].getData()
     compared_type=AST.getChildren()[0].getChildren()[2].getData()
-    #print(iterable_name)
-    #print(iterable_type)
-    #print(compared_type)
-    #print(compared_value)
     if_scope=AST.getChildren()[1]
     print(AST.getChildren()[2].getChildren())
     else_scope=AST.getChildren()[2].getChildren()[0]
@@ -174,12 +203,22 @@ def IF_statement(AST,ScopeCount,ScopeStack):
         compared_type=transform_value(compared_type)
     if(compared_type!=iterable_type):
         raise Exception("Cant compare "+compared_type+" with "+iterable_type)
+    operator=AST.getChildren()[0].getChildren()[0].getChildren()[0].getData()
+    GENERATED.write((TABCOUNTER*"\t"))
+    GENERATED.write("if("+iterable_name+str(operator)+str(compared_value)+"):\n")
     ScopeCount=scope(if_scope,ScopeCount,ScopeStack)
+    GENERATED.write((TABCOUNTER*"\t"))
+    GENERATED.write("else:\n")
+    if(len(else_scope.getChildren())<=0):
+        GENERATED.write(((TABCOUNTER+1)*"\t"))
+        GENERATED.write("pass")
+
     return scope(else_scope,ScopeCount,ScopeStack)
+
+
 def just_math_expression(AST,ScopeStack):
     elements=get_operands(AST.getChildren()[1])
     return  validate_expression(elements,ScopeStack)
-    #raise Exception("The expression type doesnt match variable's type "+varName)
 
 def get_operands(AST):
     if(AST.getData() not in operators):
@@ -188,6 +227,12 @@ def get_operands(AST):
         left_operator=get_operands(AST.getChildren()[0])
         right_operator=get_operands(AST.getChildren()[1])
         return left_operator+right_operator
+
+def get_operators(AST):
+    if(AST.getData() not in operators):
+        return []
+    else:
+        return [AST.getData()]+get_operators(AST.getChildren())
 
 def validate_expression(operands_list,Scope_Stack):
     expression_type=None
@@ -243,6 +288,7 @@ def find_var_type(VarName,Scope):
         raise Exception(except_string)
 
 def procedure_setting(AST):
+    global GENERATED
     main_flag=False
     ScopeStack=None
     for i in AST.getChildren():
@@ -250,8 +296,6 @@ def procedure_setting(AST):
         ScopeStack=Stack()
         ScopeStack.push(proc_name)
         parameters=getParamstypes(i,ScopeStack)
-        param_numbers=len(i.getChildren()[1].getData()[1:])
-        #procedure=function_descriptor(proc_name,parameters)
         TS[(proc_name)]=parameters
         if (proc_name=="main"):
             main_flag=True
@@ -319,17 +363,21 @@ def getParamstypes(AST,ScopeStack):
             return []
     return typeslist
 
+def getParamsNames(AST):
+    nameslist=[]
+    for i in AST.getChildren()[1].getChildren():
+        varName=get_identifier(i)
+        nameslist+=[varName]
+    return nameslist
 
 def valid_parameter_type(requested_param,given_param, name):
-    #print("given param")
-    #print(given_param)
     if(len(requested_param)!=len(given_param)):
         raise Exception("The number of params in "+name+" doesnt match")
     for i in range(len(requested_param)):
         for j in range(len(given_param[i])):
             focus_type=transform_value(given_param[i][j])
             requested_params=requested_param[i]
-            #print(requested_params)
+            print(focus_type)
             if(focus_type=="STRING"):
                 continue
             if('valid_insertion'== requested_params[0]):
@@ -354,7 +402,6 @@ def transform_value(varType):
         return 'float'
     else:
         return varType
-    
 
 def prebuild_setting():
     for value in prebuild.values():
@@ -369,3 +416,41 @@ def get_identifier(AST):
     return AST.getChildren()[0].getChildren()[0].getData()
 def var_to_TS(ScopeStack,varName,dataType):
     TS[tuple(ScopeStack.stack_to_list()),varName]=dataType
+
+
+### GENERATOR FILE FUNCTIONS ###
+
+def writeParameters(params,open,close):
+    global GENERATED
+    GENERATED.write(open)
+    for parameter in params:
+        GENERATED.write(str(parameter))
+        GENERATED.write(",")
+    GENERATED.write(close)
+
+def writeAssignment(AST,classifier):
+    assigned=AST.getChildren()[1]
+    if(classifier=="MATH"):
+        writeMath(assigned)
+    elif(classifier=="lista"):
+        elements=listElements(assigned)
+        writeParameters(elements,"[","]")
+    else:
+        GENERATED.write(str(assigned.getChildren()[0].getData()))
+
+def writeMath(AST):
+    expression = AST.getData()
+    if(expression in operators):
+        GENERATED.write("(")
+        writeMath(AST.getChildren()[0])
+        GENERATED.write(expression)
+        writeMath(AST.getChildren()[1])
+        GENERATED.write(")")
+    else:
+        GENERATED.write(str(AST.getChildren()[0].getData()))
+
+def listElements(AST):
+    elements=[]
+    for element in AST.getChildren():
+        elements+=[element.getChildren()[0].getData()]
+    return elements

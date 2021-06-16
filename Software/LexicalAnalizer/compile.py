@@ -8,7 +8,7 @@ def compile(filename):
     #print(Tree.inorder())
     route=os.path.dirname(filename)
     #print(route)
-    SEMANTIC(Tree)
+    SEMANTIC(Tree,route)
     #aqui llamariamos a la funcion que genera codigo a partir del arbol 
     return "hola"
 #if __name__ == '__main__':

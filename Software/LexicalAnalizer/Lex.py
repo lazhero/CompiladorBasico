@@ -51,7 +51,7 @@ nonzerodigit =   r'([1-9])'
 nondigit         = r'([_A-Za-z])'
 floatnumber =r'(    '+r'(' +nonzerodigit+ r'\.'+r'(' +digit+r')+'+ r')' + r'|' r'(' + r'(' +digit+r')+'+r'\.'+r'(' +digit+r')+'+r')'  +r')'
 identifier       = r'(' + nondigit + r'(' + digit + r'|' + nondigit + r')*)'
-boolean=r'TRUE'+r'|'+r'FALSE'
+boolean=r'True'+r'|'+r'False'
 multiplication=r'\*'
 division=r'/'
 plus=r'\+'
@@ -393,13 +393,14 @@ def p_factor_float(p):
 def p_factor_id(p):
     'factor : IDENTIFIER'
     p[0] = ["IDENTIFIER",p[1]]
+'''
 def p_factor_function_call(p):
     'factor : functioncall'
     p[0]=p[1]
 def p_factor_method_call(p):
     'factor : methodcall'
     p[0]=p[1]
-'''
+
 def p_factor_list(p):
     'factor : access_list'
     p[0]=p[1]
@@ -430,18 +431,18 @@ def p_factor2_float(p):
 def p_factor2_id(p):
     'factor2 : IDENTIFIER'
     p[0] = ["IDETIFIER",p[1]]
+'''
 def p_factor2_function_call(p):
-    'factor2 : functioncall'
+   'factor2 : functioncall'
     p[0]=p[1]
 def p_factor2_method_call(p):
     'factor2 : methodcall'
     p[0]=p[1]
-
-'''
 def p_factor2_list(p):
     'factor2 : access_list'
     p[0]=p[1]
 '''
+
 def p_factor2_expr(p):
     'factor2 : L_PAREN expression R_PAREN'
     p[0] = p[2]
@@ -497,7 +498,7 @@ def lex_syntx(filename):
     result = parser.parse(s,lexer=mylexer)
     myTree=None
     if(result!=None):
-        #print(result)
+        print(result)
         myTree = create_tree_from_list(result)
     if(len(Syntax_errors)>0):
         print(Syntax_errors)
