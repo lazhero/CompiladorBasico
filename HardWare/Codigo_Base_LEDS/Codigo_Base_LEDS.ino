@@ -129,11 +129,24 @@ void process_msg(String data){
     data.substring(14,22).toCharArray(mat_data,16);
     for(int i = 0;i<8;i++){
       Matrix[row][i] = mat_data[i]-'0';
-    }
-    if (row == 0){
+    }if (row == 0){
       flag_filling = true;
+      Serial.println("1");
+    }else if(row == 1){
+      Serial.println("2");
+    }else if(row == 2){
+      Serial.println("3");
+    }else if(row == 3){
+      Serial.println("4");
+    }else if(row == 4){
+      Serial.println("5");
+    }else if(row == 5){
+      Serial.println("6");
+    }else if(row == 6){
+      Serial.println("7");
     }else if(row == 7){
       flag_filling = false;
+      Serial.println("8");
     }
   }
   //Change function to excecute

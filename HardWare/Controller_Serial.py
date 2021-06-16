@@ -9,7 +9,7 @@ class Led_Matrix:
               [0, 0, 1, 1, 1, 1, 0, 0],
               [0, 0, 0, 1, 1, 0, 0, 0],
               [0, 0, 0, 0, 0, 0, 0, 0],
-              [0, 0, 0, 0, 0, 0, 0, 1]]
+              [0, 1, 0, 1, 1, 0, 1, 0]]
 
     def change_matrix(self, new_matrix):
         self.fill_matrix(new_matrix)
@@ -86,25 +86,33 @@ class Led_Matrix:
                 led_list.append(state)
         return led_list
 
-def write_list_to_arduino(_list):
-    msg = ""
-    for i in range(0,8):
-        for j in range(0,8):
-            msg = msg+str(Led_Matrix.matrix[i][j])
-    return msg
-    
-def blink():
-    
-    test = Led_Matrix()
-    counter = 0
-    while counter < 5:
-        counter+=1
-        time.sleep(1)    
-        matrix = write_list_to_arduino(test.matrix_to_list())
-
+def write_matrix_to_arduino():
+    row = 0
+    data_rec = ""
+    while data_rec != "8":
+        if data_rec == "8\n":
+            break
         try:
-            print(serial_port.readline().decode('ascii'))
+            row = int(data_rec)
         except:
             pass
+        if row == 8:
+            break
+        msg = "fill_matrix,"+str(row)+","
+        for i in range(0,8):
+            msg = msg+str(Led_Matrix.matrix[row][i])
+        serial_port.write(msg.encode('ascii'))
+        data_rec = serial_port.readline().decode('ascii')
+    
+def blink():
+    pass
 
-blink()
+def test():
+    test = Led_Matrix()   
+    write_matrix_to_arduino()
+    try:
+        print(serial_port.readline().decode('ascii'))
+    except:
+        pass
+
+test()
