@@ -149,9 +149,17 @@ void process_msg(String data){
     process_array[3] = state;
     change_blink_matrix(Matrix);
     set_delay();
+    if(state == "0"){
+      clear_blink();
+    }
   }
 }
-
+void clear_blink(){
+  process_array[0] = "";
+  time_delay = 1;
+  reset_matrix();
+  change_Matrix(Matrix);
+}
 void set_delay(){
   if(process_array[2] == "0"){//milisegunods
     time_delay = process_array[1].toInt();
