@@ -177,8 +177,8 @@ void loop()
 {  
   if(Serial.available()>0){
     data_rec = Serial.readString();
-    process_msg(data_rec);
     process_array[0] = "";
+    process_msg(data_rec);
     //data_rec.toCharArray(Matrix_list, sizeof(Matrix_list));
     //list_to_matrix();
   }
