@@ -104,7 +104,7 @@ def t_IDENTIFIER(t):
     if(Method!='IDENTIFIER'):
         t.type='RESERVED_METHOD'
     if(DATATYPE!='IDENTIFIER'):
-        t.type='pene'
+        t.type='PARAMSETTERS'
     return t
 def t_newline(t):
     r'\n+'
@@ -154,7 +154,7 @@ def p_args_element(p):
     p[0]=[p[1]]
 
 def p_final_arg(p):
-    'final_arg : pene iterable'
+    'final_arg : PARAMSETTERS iterable'
     p[0]=["ARGS",p[2],p[1]]
 
 def p_Parameters(p):

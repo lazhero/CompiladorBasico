@@ -27,7 +27,7 @@ tokens = [
     'MAIN_FUNC',
     'PROCEDURE',
     'COLON',
-    'pene',
+    'PARAMSETTERS',
     'STRING'
    
 ]
@@ -66,7 +66,7 @@ reserved_function_params={
     "PRINT_LED"  : [['int'],['int'],['bool']],
     'PRINT_LED_X': [["RESERVED_SPECIAL_OBJECT"],['int'],["lista"]],
     'RANGE'      : [["int"],["bool"]],
-    'LIST'       : [['pene']],
+    'LIST'       : [['lista']],
     'TYPE'       : [['ANY']],
     'LEN'        : [["lista"]],
 }
@@ -97,7 +97,6 @@ method_valid_params_types={
     'NEG':[],
     'SHAPE_F':[],
     'SHAPE_C':[],
-
 }
 valid_insertion_type=[0,1]
 reserved_special_time=[ '"seg"','"min"','"mil"']
