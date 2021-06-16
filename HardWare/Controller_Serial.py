@@ -14,24 +14,35 @@ class Led_Matrix:
     def change_matrix(self, new_matrix):
         self.fill_matrix(new_matrix)
 
-    def fill_matrix_aux(self, matrix):
+    def fill_matrix_aux(self, new_matrix):
         res_matrix = []
         # makes the res_matrix an 8x8 matrix
         for i in range(0, 8):
             res_matrix.append([0, 0, 0, 0, 0, 0, 0, 0])
-
+        
         # fills the res_matrix with the corresponding data
-        for i in range(0, len(matrix)):
-            for j in range(0, len(matrix[0])):
-                res_matrix[i][j] = matrix[i][j]
-        self.matrix = res_matrix
+        if self.is_valid_matrix(new_matrix):
+            for i in range(0, len(new_matrix)):
+                for j in range(0, len(new_matrix[0])):
+                    res_matrix[i][j] = new_matrix[i][j]
+        #fills the res_matrix with the only led to write to
+        else:
+            row = new_matrix//8
+            col = new_matrix%8
+            res_matrix[row][col] = 1
+        return res_matrix
 
-    def fill_matrix(self, matrix):
-        if self.is_valid_matrix(matrix):
-            if len(matrix) < 8 or len(matrix[0]) < 8:
-                self.fill_matrix_aux(matrix)
+    def fill_matrix(self, new_matrix):
+        if self.is_valid_matrix(new_matrix):
+            if len(new_matrix) < 8 or len(new_matrix[0]) < 8:
+                return self.fill_matrix_aux(new_matrix)
             else:
-                self.matrix = matrix
+                return new_matrix
+        if isinstance(new_matrix,int):
+            if new_matrix>64 or new_matrix<0:
+                raise Exception("ERROR, MATRIZ NO ES VALIDA")
+            else:
+                return self.fill_matrix_aux(new_matrix)
         else:
             raise Exception("ERROR, MATRIZ NO ES VALIDA")
 
@@ -84,7 +95,7 @@ class Led_Matrix:
                 led_list.append(state)
         return led_list
 
-def write_matrix_to_arduino():
+def write_matrix_to_arduino(matrix):
     row = 0
     data_rec = ""
     while data_rec != "8":
@@ -98,19 +109,35 @@ def write_matrix_to_arduino():
             break
         msg = "fill_matrix,"+str(row)+","
         for i in range(0,8):
-            msg = msg+str(Led_Matrix.matrix[row][i])
+            msg = msg+str(matrix[row][i])
         serial_port.write(msg.encode('ascii'))
         data_rec = serial_port.readline().decode('ascii')
     
-def blink():
-    pass
+def blink(data, time, time_unit, state):
+    helper = Led_Matrix()
+    matrix_to_send = helper.fill_matrix(data)
+    msg = "blink,"+str(time)+","
+    #add time unit to msg
+    if time_unit == "Seg":
+        msg = msg + str(1) + ","
+    elif time_unit == "Min":
+        msg = msg + str(2) + ","
+    elif time_unit == "Mil":
+        msg = msg + str(0) + ","
+    else:
+        raise Exception("NOT VALID TIME UNIT")
+    #add state to msg
+    if state == True:
+        msg = msg + str(1)
+    elif state == False:
+        msg = msg + str(0)
+    else:
+        raise Exception("NOT VALID STATE")
+    write_matrix_to_arduino(matrix_to_send)
+    serial_port.write(msg.encode('ascii'))
 
 def test():
-    test = Led_Matrix()   
-    write_matrix_to_arduino()
-    try:
-        print(serial_port.readline().decode('ascii'))
-    except:
-        pass
+    blink(55,1000,"Mil",True)
+    
 
 test()
