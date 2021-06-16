@@ -1,0 +1,15 @@
+Procedure main(int carajo,int pene){
+   milista=[True,False];
+   x=3;
+   if x>5{
+      x=4;
+   }
+   else{
+      x=2;
+   }
+}
+
+
+
+
+
