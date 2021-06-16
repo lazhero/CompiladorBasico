@@ -204,12 +204,33 @@ def PRINT_LED(col, row, value):
     
 def PRINT_LEDX(type,index,values):
     helper = Led_Matrix()
-    if type == "C":
-        mat_to_send = helper.fill_matrix_val(0,False)
-
+    mat_to_send = helper.fill_matrix_val(0,0)
+    if type == "F":
+        for i in range(0,len(values)):
+            if values[i] == True:
+                mat_to_send[index][i] = 1
+            else:
+                mat_to_send[index][i] = 0
+    elif type == "C":
+        for i in range(0,len(values)):
+            if values[i] == True:
+                mat_to_send[i][index] = 1
+            else:
+                mat_to_send[i][index] = 0
+    elif type == "M":
+        for i in range(0,len(values)):
+            for j in range(0,len(values[i])):
+                if values[i][j] == True:
+                    mat_to_send[i][j] = 1
+                else:
+                    mat_to_send[i][j] = 0
+    else:
+        raise Exception("ERROR EN TIPO DE OBJETO")
+    write_matrix_to_arduino(mat_to_send) 
 
 def test():
     BLINK(55,1000,"Mil",True)
 
-helper = Led_Matrix()
-print(helper.fill_matrix_val(0,0))
+PRINT_LEDX("M",0,[[True , True , True, True, False, True, False, True],
+[True , True , True, True, True, True, True, True ],
+[False , False, False, True, True, True, True, True]])
