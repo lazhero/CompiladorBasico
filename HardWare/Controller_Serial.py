@@ -58,10 +58,8 @@ class Led_Matrix:
                 return False
             if not self.is_rectangular_matrix(matrix):
                 return False
-
             else:
                 return True
-
         else:
             return False
 
