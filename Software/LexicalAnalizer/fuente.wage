@@ -5,7 +5,15 @@ Procedure main(int carajo,int pene){
    var.delete(var2,1);
    julian=2;
    for var14 in var Step 2{
-      
+      if var2<24{
+         x=3.24;
+      }
+      if var2==FALSE{
+
+      }
+      else{
+         x=2.89;
+      }
    }
    if var2==var4{
    }
@@ -13,6 +21,11 @@ Procedure main(int carajo,int pene){
    }
 
 }
+Procedure basquest(int carajo,int pene){
+
+
+}
+
 
 
 

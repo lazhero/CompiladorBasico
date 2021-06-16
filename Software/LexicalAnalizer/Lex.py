@@ -475,9 +475,12 @@ def p_noiterable_str(p):
     p[0]=["STRING",p[1]]
 
 # Error rule for syntax errors
+global syntax_errors
+Syntax_errors=[]
 def p_error(p):
-    print("Syntax error in line "+str(p.lineno),end="")
-    print(" symbol \'"+str(p.value)+"\'")
+    error_string="Syntax error in line "+str(p.lineno)+" symbol \'"+str(p.value)+"\'"
+    Syntax_errors.append(error_string)
+
 
 
 def lex_syntx(filename):
@@ -496,6 +499,9 @@ def lex_syntx(filename):
     if(result!=None):
         print(result)
         myTree = create_tree_from_list(result)
+    if(len(Syntax_errors)>0):
+        print(Syntax_errors)
+        raise Exception("syntax errors need to be fixed ")
     return myTree
 
 

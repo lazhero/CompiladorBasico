@@ -46,6 +46,7 @@ def procedure(AST):
     process_children(AST,Scope_Count,Scope_Stack)
 
 def process_children(AST,Scope_Count,Scope_Stack):
+    #print()
     children=AST.getChildren()
     if(AST.getData()=="PROCEDURE"):
         children=children[1:]
