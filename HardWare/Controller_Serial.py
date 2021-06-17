@@ -1,4 +1,6 @@
-import serial, time
+from tkinter import EXCEPTION
+import serial, time, sys
+sys.tracebacklimit = 1
 try:
     serial_port = serial.Serial('COM3',baudrate=57600, timeout=1)
 except:
@@ -185,17 +187,15 @@ def DELAY(_time, time_unit):
 
 def NEG(data):
     if isinstance(data, bool):
-        if data == True:
-            return False
-        return True
+        return not data
     elif isinstance(data, list):
         res = []
         for element in data:
-            if element == True:
-                res.append(False)
-            else:
-                res.append(True)
+            element = NEG(element)
+            res.append(element)
         return res
+    else:
+        raise Exception("data not valid")
 
 def PRINT_LED(col, row, value):
     index = row*8+col
@@ -366,5 +366,3 @@ def SMILE():
             break
         serial_port.write(msg.encode('ascii'))
         res = serial_port.readline().decode('ascii')
-    
-BLINK(63,1,"Seg",1)

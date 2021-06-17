@@ -435,7 +435,7 @@ def valid_parameter_type(requested_param,given_param, name):
             requested_params=requested_param[i]
             if(focus_type=="STRING"):
                 continue
-            if('valid_insertion'== requested_params[0]):
+            if('valid_insertion'== requested_params[0] or 'ANY' == requested_params[0]):
                 continue
             if(focus_type==METHODCALL):
                 continue

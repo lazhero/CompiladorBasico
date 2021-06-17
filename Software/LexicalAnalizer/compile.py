@@ -5,6 +5,7 @@ from Lex import lex_syntx
 from Semantic import SEMANTIC
 sys.tracebacklimit = 0
 def compile(filename):
+    print(filename)
     currentPath=os.path.abspath(__file__)
     currentPath=os.path.dirname(currentPath)
     currentPath=os.path.dirname(currentPath)
@@ -14,6 +15,7 @@ def compile(filename):
     route=os.path.dirname(filename)
     returning = SEMANTIC(Tree,route,currentPath)
     print("File compiled successfully")
+    
     return returning
     
 def compile_and_run(filename):
@@ -22,7 +24,8 @@ def compile_and_run(filename):
     command = command = ["python",outputFile,"main"]
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     output, error = process.communicate()
-    return output
-    #if __name__ == '__main__':
- #   globals()[sys.argv[1]](sys.argv[2])
+    print(output)
+    print(error)
+if __name__ == '__main__':
+    globals()[sys.argv[1]](sys.argv[2])
 #compile("C:/Users/allva/Desktop/LedAnimator/Software/LexicalAnalizer/fuente.wage")

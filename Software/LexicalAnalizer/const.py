@@ -56,6 +56,10 @@ reserved_function_names={
     'list'       : 'LIST',
     'type'       : 'TYPE',
     'len'        : 'LEN',
+    'smile'      : 'SMILE',
+    'heart'      : 'HEART',
+    'tec'        : 'TEC',
+    'PRINT'      : 'print'
 }
 
 
@@ -69,6 +73,10 @@ reserved_function_params={
     'LIST'       : [['lista']],
     'TYPE'       : [['ANY']],
     'LEN'        : [["lista"]],
+    'SMILE'      : [],
+    'HEART'      : [],
+    'TEC'        : [],
+    'print'      : [['ANY']],
 }
 reserved_methods_names={
     'F'      :'F_METHOD',
