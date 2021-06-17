@@ -342,5 +342,15 @@ def columnAccess(lista,index):
         columnList+=lista[i][index]
     return columnList
 
+def TEC():
+    serial_port.write("tec".encode('ascii'))
+    print(serial_port.readline().decode('ascii'))
+def HEART():
+    serial_port.write("heart".encode('ascii'))
+    print(serial_port.readline().decode('ascii'))
+def SMILE():
+    serial_port.write("smile".encode('ascii'))
+    while True:
+        print(serial_port.readline().decode('ascii'))
 
-
+SMILE()
