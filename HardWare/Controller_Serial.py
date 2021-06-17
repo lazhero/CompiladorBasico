@@ -5,14 +5,14 @@ except:
     print("NO SE CONECTO EL ARDUINO")
 
 class Led_Matrix:
-    matrix = [[0, 0, 1, 0, 0, 1, 0, 0],
+    F_matrix=[[0, 0, 1, 0, 0, 1, 0, 0],
               [0, 1, 1, 1, 1, 1, 1, 0],
               [0, 1, 1, 1, 1, 1, 1, 0],
               [0, 1, 1, 1, 1, 1, 1, 0],
               [0, 0, 1, 1, 1, 1, 0, 0],
               [0, 0, 0, 1, 1, 0, 0, 0],
               [0, 0, 0, 0, 0, 0, 0, 0],
-              [0, 1, 0, 1, 1, 0, 1, 0]]
+              [0, 0, 0, 0, 0, 0, 0, 0]]
 
     def change_matrix(self, new_matrix):
         self.fill_matrix(new_matrix)
@@ -276,5 +276,47 @@ def INSERT(matrix, boolean_list,type,index):
             r.append(0)
     return helper.fill_matrix_aux(new_matrix)
 
-print(INSERT([[True , True , True],[False , False ,False]], [True , False ,False],0,0))
+def TYPE(n):
+    return type(n)
+
+def LEN(n):
+    return len(n)
+
+def RANGE(num, boolean):
+    _list = []
+    for i in range(0,num):
+        _list += [boolean]
+    return _list
+
+def SHAPE_F(matrix):
+    return len(matrix)
+
+def SHAPE_C(matrix):
+    return len(matrix[0])
+
+def T(data):
+    if isinstance(data,bool):
+        return True
+    else:
+        for i in range(0,len(data)):
+            if isinstance(data[i],list):
+                T(data[i])
+            else:
+                data[i] = True
+        return data
+
+def F(data):
+    if isinstance(data,bool):
+        return False
+    else:
+        for i in range(0,len(data)):
+            if isinstance(data[i],list):
+                T(data[i])
+            else:
+                data[i] = False
+        return data
+def DELETE(matrix, index, type):
+     pass
+
+print(T(False))
 
