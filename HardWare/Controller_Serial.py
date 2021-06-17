@@ -315,8 +315,26 @@ def F(data):
             else:
                 data[i] = False
         return data
-def DELETE(matrix, index, type):
-     pass
 
-print(T(False))
+def index_in_all_columns(matrix,index):
+    for rows in matrix:
+        if len(rows)<=index:
+            return False
+    return True
+
+def DELETE(matrix, index, type):
+    #filas
+    if type == 0:
+        if index < len(matrix):
+            matrix.pop(index)
+            return matrix
+    #columnas
+    elif type == 1:
+        if index_in_all_columns(matrix,index):
+            for row in matrix:
+                row.pop(index)
+            return matrix
+    raise Exception("INIDICE NO ES VALIDO")
+
+print(DELETE([[1,2,3,4],[9,10,11,12],[5,6,7]],3,1))
 
