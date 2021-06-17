@@ -20,7 +20,6 @@ from TS import TS_FROM_m_tree as TSF
 
  
  # List of token names.   This is always required
-
 tokens=list(reserved.values())+tokens+list(FunctionDataSetters)
 
  # Regular expression rules for simple tokens
@@ -66,7 +65,7 @@ higher_or_equal=r'>='
 pow=r'\*\*'
 operators=r'('+pow+r'|'+multiplication+r'|'+division+r'|'+int_division+r'|'+leftover+r'|'+plus+r'|'+minus+r')'
 comparator=r'('+equals+r'|'+lower+r'|'+lower_or_equal+r'|'+higher+r'|'+higher_or_equal+r')'
-
+lexErrors=[]
 @lex.Token(comparator)
 def t_COMPARATOR(t):
     return t
@@ -112,8 +111,8 @@ def t_newline(t):
  
  # Error handling rule
 def t_error(t):
-     print("Illegal character '%s'" % t.value[0])
-     t.lexer.skip(1)
+    print("Illegal character '%s'" % t.value[0])
+    t.lexer.skip(1)
 
  
  # Build the lexer
@@ -510,10 +509,11 @@ def lex_syntx(filename):
     result = parser.parse(s,lexer=mylexer)
     myTree=None
     if(result!=None):
-        print(result)
+        #print(result)
         myTree = create_tree_from_list(result)
     if(len(Syntax_errors)>0):
-        print(Syntax_errors)
+        for error in Syntax_errors:
+            print(error)
         raise Exception("syntax errors need to be fixed ")
     return myTree
 
