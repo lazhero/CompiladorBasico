@@ -234,6 +234,42 @@ def PRINT_LED_X(type,index,values):
 def LIST(n):
     return list(n)
 
-def test():
-    BLINK(55,1000,"Mil",True)
+def INSERT(matrix, boolean_list,type,index):
+    helper = Led_Matrix()
+    new_matrix = helper.fill_matrix_val(0,0)
+    bool_list = boolean_list
+    while len(boolean_list)<8:
+        bool_list.append(0)
+    #filas
+    if type == 0:
+        for i in range(0,len(matrix)+1):
+            if i < index:
+                new_matrix[i] = matrix[i]
+            elif i == index:
+                new_matrix = bool_list
+            else:
+                try:
+                    new_matrix[i] = matrix[i-1]
+                except:
+                    new_matrix.append([0,0,0,0,0,0,0,0])
+                    new_matrix[i] = matrix[i-1]
+    #columnas
+    elif type == 1:
+        for i in range(0, len(matrix)):
+            for j in range(0, len(matrix[i])+1):
+                if j < index:
+                    new_matrix[i][j] = matrix[i][j]
+                elif i == index:
+                    new_matrix[i][j] = bool_list[j]
+                else:
+                    try:
+                        new_matrix[i][j] = matrix[i][j-1]
+                    except:
+                        for r in new_matrix:
+                            r.append(0)
+                        new_matrix[i][j] = matrix[i][j-1]
+    return new_matrix
+
+
+print(INSERT([[True , True , True],[False , False ,False]], [False , False ,False],0,0))
 
