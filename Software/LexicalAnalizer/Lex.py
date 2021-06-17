@@ -181,9 +181,11 @@ def p_final_param_iterable(p):
 def p_final_param_noiterable(p):
     'final_param : noiterable'
     p[0]=p[1]
+
 def p_final_param_list(p):
     'final_param : list'
     p[0]=p[1] 
+
 def p_final_param_expression(p):
     'final_param : expression'
     p[0]=p[1]
@@ -325,6 +327,7 @@ def p_params2_element(p):
 def p_final_param2_LIST(p):
     'final_param2 : list'
     p[0]=p[1]
+
 def p_final_param2_BOOLEAN(p):
     'final_param2 : BOOLEAN'
     p[0]=["BOOLEAN",p[1]]
@@ -343,13 +346,13 @@ def p_index_list_range(p):
     p[0]=["RANGE",p[2],p[4]]
 def p_index_list_matrix_access(p):
     'index_list : L_SQUARE_PAREN allowed_access_index COMA allowed_access_index R_SQUARE_PAREN'
-    p[0]=["RANGE",p[2],p[4]]
+    p[0]=["DOUBLESINGLE",p[2],p[4]]
 def p_index_list_range_start_no_defined(p):
     'index_list : L_SQUARE_PAREN COLON COMA allowed_access_index R_SQUARE_PAREN'
-    p[0]=["RANGE","NODEFINED",p[4]]
+    p[0]=["COLUMN",p[4]]
 def p_index_list_range_end_no_defined(p):
     'index_list : L_SQUARE_PAREN allowed_access_index COMA COLON R_SQUARE_PAREN'
-    p[0]=["RANGE",p[2],"NODEFINED"]
+    p[0]=["SINGLE",p[2]]
 def p_allowed_access_index_integer(p):
     'allowed_access_index : INTEGER'
     p[0]=["INTEGER",p[1]]

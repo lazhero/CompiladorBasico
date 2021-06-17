@@ -24,6 +24,7 @@ PARAMETERS="PARAMETERS"
 ASSIGNMENT="ASSIGMENT"
 METHODCALL="METHOD_CALL"
 FUNCTIONCALL="CALL_FUNC"
+LIST="LIST"
 ACCESS="ACCESS"
 SCOPE="SCOPE"
 FOR="FOR"
@@ -125,8 +126,6 @@ def function_call(AST,ScopeCount,ScopeStack):
     evaluate_special_string(Parameters_requested,Parameters_values)
 
     writeFunctionCall(FunctionName,Parameters_values)
-    #GENERATED.write((TABCOUNTER*"\t")+FunctionName)
-    #writeParameters(Parameters_values,"(",")")
     GENERATED.write("\n")
 
     return ScopeCount
@@ -363,14 +362,17 @@ def parameters_type_func_call(AST,ScopeStack):
 
 def parameters_value_func_call(AST,ScopeStack):
     Parameters=[]
-    #print(AST.getData())
     for Parameter in AST.getChildren():
         value= Parameter.getData()
         
         if(value==FUNCTIONCALL):
             functionName=get_identifier(Parameter)
+            functionName=prebuild[functionName]
             ParameterValue=parameters_value_func_call(Parameter.getChildren()[1],ScopeStack)
             ParameterValue=[functionName]+ParameterValue
+        elif(value==LIST):
+            ParameterValue= [listElements(Parameter)]
+            
         else:
             ParameterValue=Parameter.getChildren()[0].getData()
         Parameters+=[ParameterValue]
@@ -470,8 +472,6 @@ def in_TS(id_tuple):
     return id_tuple in TS.keys()
 
 def setting_access(AST,ScopeStack):
-    #[['RANGE', ['INTEGER', 1], ['INTEGER', 2]], ['SINGLE', ['IDENTIFIER', 'varxx']]]
-    #[[1,":",2],[2]]
     accessList=[]
     for i in AST:
         accessType=i.getData()
@@ -487,6 +487,19 @@ def setting_access(AST,ScopeStack):
             access_verify(firstAccess,ScopeStack)
             access_verify(secondAccess,ScopeStack)
             accessList+=[str(firstAccess.getChildren()[0].getData())+":"+str(secondAccess.getChildren()[0].getData())]
+        elif(accessType=="DOUBLESINGLE"):
+            firstAccess=i.getChildren()[0]
+            secondAccess=i.getChildren()[1]
+            access_verify(firstAccess,ScopeStack)
+            access_verify(secondAccess,ScopeStack)
+            accessList+=[str(firstAccess.getChildren()[0].getData())]+[str(secondAccess.getChildren()[0].getData())]
+        elif(accessType=="COLUMN"):
+            firstAccess=i.getChildren()[0]
+            access_verify(firstAccess,ScopeStack)
+            function="columnAccess("
+            accessList+=[[firstAccess.getChildren()[0].getData()]]
+
+            pass
     print(accessList)
     return accessList
 
@@ -496,13 +509,11 @@ def access_verify(node,ScopeStack):
         nodeName=node.getChildren()[0].getData()
         find_var_type(nodeName,ScopeStack)
 
-
 def get_identifier(AST):
     return AST.getChildren()[0].getChildren()[0].getData()
 
 def var_to_TS(ScopeStack,varName,dataType):
     TS[tuple(ScopeStack.stack_to_list()),varName]=dataType
-
 
 
 ### GENERATOR FILE FUNCTIONS ###
@@ -511,9 +522,18 @@ def writeParameters(params,open,close):
     global GENERATED
     GENERATED.write(open)
     for parameter in params:
+        print(parameter)
         if(isinstance(parameter,list)):
-            GENERATED.write(str(parameter[0]))
-            writeParameters(parameter[1:],open,close)
+            firstElement=parameter[0]
+            if(isinstance(firstElement,list)):
+                #writeParameters(firstElement,"[","]")
+                writeList(firstElement,"[","]")
+                GENERATED.write(",")
+
+            else:
+                GENERATED.write(str(firstElement))
+                writeParameters(parameter[1:],open,close)
+                GENERATED.write(",")
         else:
             GENERATED.write(str(parameter))
             GENERATED.write(",")
@@ -524,11 +544,24 @@ def writeAssignment(AST,classifier,ScopeStack):
     if(classifier=="MATH"):
         writeMath(assigned)
     elif(classifier=="lista"):
-        elements=listElements(assigned)
-        writeParameters(elements,"[","]")
+        writeListParams(assigned)
     
     else:
         GENERATED.write(str(assigned.getChildren()[0].getData()))
+
+
+def writeList(elements,open,close):
+    GENERATED.write(open)
+    for element in elements:
+        if(isinstance(element,list)):
+            writeList(element,open,close)
+            GENERATED.write(",")
+        else:
+            GENERATED.write(element)
+            GENERATED.write(",")
+    GENERATED.write(close)
+    
+
 
 def writeMath(AST):
     expression = AST.getData()
@@ -552,15 +585,34 @@ def writeMethodCall(MethodName,VarName,Parameters_values):
 
 def writeAccess(varName,accessElements):
     GENERATED.write((TABCOUNTER*"\t"))
+    element0=accessElements[0]
+    if(isinstance(element0,list)):
+            GENERATED.write("columnAccess(")
+            GENERATED.write(varName)
+            GENERATED.write(",")
+            GENERATED.write(str(element0))
+            GENERATED.write(")")
+            GENERATED.write("\n")
+            return
     GENERATED.write(varName)
     for element in accessElements:
         GENERATED.write("[")
         GENERATED.write(str(element))
         GENERATED.write("]")
+    
     GENERATED.write("\n")
+
+def writeListParams(listNode):
+    elements=listElements(listNode)
+    writeList(elements,"[","]")
 
 def listElements(AST):
     elements=[]
     for element in AST.getChildren():
-        elements+=[element.getChildren()[0].getData()]
+        #print(element.getData())
+        if(element.getData()=="LIST"):
+            elements+=[listElements(element)]
+        else:
+            elements+=[element.getChildren()[0].getData()]
+    #print(elements)
     return elements
