@@ -92,8 +92,7 @@ void Display()
     for(int r = 0;r<8;r++)  
     {  
       digitalWrite(R[r],Matrix[r][c]);  
-    }  
-    delay(1);  
+    }    
     Clear();  //Remove empty display light
   } 
    
@@ -179,7 +178,7 @@ void set_delay(){
   }else if(process_array[2] == "1"){//segundos
     time_delay = process_array[1].toInt()*1000;
   }else if(process_array[2] == "2"){//min
-    time_delay = (process_array[1].toInt()*1000)*60;
+    time_delay = (process_array[1].toInt()*60000);
   }
 }
 

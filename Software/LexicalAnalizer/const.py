@@ -99,7 +99,7 @@ method_valid_params_types={
     'SHAPE_C':[],
 }
 valid_insertion_type=[0,1]
-reserved_special_time=[ '"seg"','"min"','"mil"']
+reserved_special_time=[ '"Seg"','"Min"','"Mil"']
 reserved_special_object=[ '"F"', '"C"','"M"',]
 
 operators=['+','*','**','/','//','-']

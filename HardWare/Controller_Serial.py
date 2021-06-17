@@ -24,7 +24,7 @@ class Led_Matrix:
         if self.is_valid_matrix(new_matrix):
             for i in range(0, len(new_matrix)):
                 for j in range(0, len(new_matrix[0])):
-                    res_matrix[i][j] = new_matrix[i][j]
+                    res_matrix[i][j] = int(new_matrix[i][j])
         #fills the res_matrix with the only led to write to
         else:
             row = new_matrix//8
@@ -41,7 +41,7 @@ class Led_Matrix:
         if self.is_valid_matrix(new_matrix):
             for i in range(0, len(new_matrix)):
                 for j in range(0, len(new_matrix[0])):
-                    res_matrix[i][j] = new_matrix[i][j]
+                    res_matrix[i][j] = int(new_matrix[i][j])
         #fills the res_matrix with the only led to write to
         else:
             row = new_matrix//8
@@ -55,11 +55,14 @@ class Led_Matrix:
                 return self.fill_matrix_aux(new_matrix)
             else:
                 return new_matrix
-        if isinstance(new_matrix,int):
+        elif isinstance(new_matrix,int):
             if new_matrix>64 or new_matrix<0:
                 raise Exception("ERROR, MATRIZ NO ES VALIDA")
             else:
                 return self.fill_matrix_aux(new_matrix)
+        elif isinstance(new_matrix,list):
+            temp = [new_matrix]
+            return self.fill_matrix_aux(temp)
         else:
             raise Exception("ERROR, MATRIZ NO ES VALIDA")
     
@@ -234,6 +237,3 @@ def LIST(n):
 def test():
     BLINK(55,1000,"Mil",True)
 
-PRINT_LED_X("M",0,[[True , True , True, True, False, True, False, True],
-[True , True , True, True, True, True, True, True ],
-[False , False, False, True, True, True, True, True]])
