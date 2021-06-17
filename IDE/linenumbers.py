@@ -25,13 +25,13 @@ class ScrollText(tk.Frame):
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.numberLines.pack(side=tk.LEFT, fill=tk.Y, padx=(5, 0))
         self.text.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
-
+        self.code_output = Text(height=10)
         file_menu = Menu(my_menu, tearoff=False)
         my_menu.add_cascade(label="File", menu=file_menu)
-        file_menu.add_command(label="New", command=lambda: self.new_file(False), accelerator="Ctrl+N")
-        file_menu.add_command(label="Open", command=lambda: self.open_file(False), accelerator="Ctrl+O")
-        file_menu.add_command(label="Save", command=lambda: self.save_file(False), accelerator="Ctrl+S")
-        file_menu.add_command(label="Save As", command=lambda: self.save_as_file(False), accelerator="Ctrl+Shift+S")
+        file_menu.add_command(label="New", command=lambda: self.new_file(False))
+        file_menu.add_command(label="Open", command=lambda: self.open_file(False))
+        file_menu.add_command(label="Save", command=lambda: self.save_file(False))
+        file_menu.add_command(label="Save As", command=lambda: self.save_as_file(False))
         file_menu.add_separator()
         file_menu.add_command(label="Exit", command=root.quit)
 
@@ -111,25 +111,41 @@ class ScrollText(tk.Frame):
     def run(self):
         global open_file_name
         if open_file_name:
-            code_output = Text(height=10)
-            code_output.pack()
             compiler_route=get_compiler_route()
-            test = subprocess.Popen(["ping","-W","2","-c", "1", "google.com"], stdout=subprocess.PIPE)
-            output = test.communicate()[0]
-            print(output)
-            '''
-            command = command = ["python",compiler_route,"compile",open_file_name]
+            
+            command = command = ["python",compiler_route,"compile_and_run",open_file_name]
             process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
             output, error = process.communicate()
-            code_output.insert('1.0', output)
-            code_output.insert('1.0', error)
+            self.code_output.delete(1.0,END)
+            self.code_output.pack()
+            self.code_output.insert('1.0', output)
+            self.code_output.insert('1.0', error)
+            print("El output")
+            print(output)
+            print("El error")
             print(error)
-            print("pene")
-            '''
+            
         else:
             self.open_file(FALSE)
     def compile(self):
-        pass
+        global open_file_name
+        if open_file_name:
+            compiler_route=get_compiler_route()
+            
+            command = command = ["python",compiler_route,"compile",open_file_name]
+            process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+            output, error = process.communicate()
+            self.code_output.delete(1.0,END)
+            self.code_output.pack()
+            self.code_output.insert('1.0', output)
+            self.code_output.insert('1.0', error)
+            print("El output")
+            print(output)
+            print("El error")
+            print(error)
+            
+        else:
+            self.open_file(FALSE)
 
 
 '''THIS CODE IS CREDIT OF Bryan Oakley (With minor visual modifications on my side): 
@@ -169,7 +185,7 @@ if __name__ == '__main__':
 
     root.config(menu=my_menu)
 
-    scroll.insert(tk.END, "HEY" + 20*'\n')
+    scroll.insert(tk.END, "" + 0*'\n')
     scroll.pack()
     scroll.text.focus()
     root.after(200, scroll.redraw())

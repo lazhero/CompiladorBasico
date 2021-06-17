@@ -1,7 +1,9 @@
 import sys
+import subprocess
 import os
 from Lex import lex_syntx 
 from Semantic import SEMANTIC
+sys.tracebacklimit = 0
 def compile(filename):
     currentPath=os.path.abspath(__file__)
     currentPath=os.path.dirname(currentPath)
@@ -10,9 +12,17 @@ def compile(filename):
     print(currentPath)
     Tree=lex_syntx(filename)
     route=os.path.dirname(filename)
-    SEMANTIC(Tree,route,currentPath)
-    return "hola"
+    returning = SEMANTIC(Tree,route,currentPath)
+    print("File compiled successfully")
+    return returning
     
-#if __name__ == '__main__':
+def compile_and_run(filename):
+    outputFile=compile(filename)
+
+    command = command = ["python",outputFile,"main"]
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    output, error = process.communicate()
+    return output
+    #if __name__ == '__main__':
  #   globals()[sys.argv[1]](sys.argv[2])
-compile("C:/Users/allva/Desktop/LedAnimator/Software/LexicalAnalizer/fuente.wage")
+#compile("C:/Users/allva/Desktop/LedAnimator/Software/LexicalAnalizer/fuente.wage")

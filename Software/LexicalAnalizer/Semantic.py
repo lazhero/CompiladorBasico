@@ -35,7 +35,8 @@ def SEMANTIC(AST,outputPath,currentPath):
     global GENERATED, TABCOUNTER
     currentPath+=PATH
     currentPath=currentPath.replace('"\"','"/"')
-    GENERATED=open(outputPath+"/"+OUTPUTFILE,"w")
+    outputFile= outputPath+"/"+OUTPUTFILE
+    GENERATED=open(outputFile,"w")
     GENERATED.write("import sys\n")
     GENERATED.write("sys.path.append(r")
     GENERATED.write('"')
@@ -48,6 +49,7 @@ def SEMANTIC(AST,outputPath,currentPath):
     GENERATED.write("\n")
     TABCOUNTER=0
     program(AST)
+    return outputFile
 
 def program(AST):
     MAIN_FLAG=True
@@ -226,7 +228,6 @@ def IF_statement(AST,ScopeCount,ScopeStack):
     compared_value = AST.getChildren()[0].getChildren()[2].getChildren()[0].getData()
     compared_type=AST.getChildren()[0].getChildren()[2].getData()
     if_scope=AST.getChildren()[1]
-    #print(AST.getChildren()[2].getChildren())
     else_scope=AST.getChildren()[2].getChildren()[0]
     if (compared_type == 'IDENTIFIER'):
         compared_type=find_var_type(compared_value,ScopeStack)
@@ -432,7 +433,6 @@ def valid_parameter_type(requested_param,given_param, name):
         for j in range(len(given_param[i])):
             focus_type=transform_value(given_param[i][j])
             requested_params=requested_param[i]
-            #print(focus_type)
             if(focus_type=="STRING"):
                 continue
             if('valid_insertion'== requested_params[0]):
@@ -475,12 +475,10 @@ def setting_access(AST,ScopeStack):
     accessList=[]
     for i in AST:
         accessType=i.getData()
-        print(accessType)
         if(accessType=="SINGLE"):
             firstAccess=i.getChildren()[0]
             access_verify(firstAccess,ScopeStack)
             accessList+=[str(firstAccess.getChildren()[0].getData())]
-            print(accessList)
         elif(accessType=="RANGE"):
             firstAccess=i.getChildren()[0]
             secondAccess=i.getChildren()[1]
@@ -498,9 +496,6 @@ def setting_access(AST,ScopeStack):
             access_verify(firstAccess,ScopeStack)
             function="columnAccess("
             accessList+=[[firstAccess.getChildren()[0].getData()]]
-
-            pass
-    print(accessList)
     return accessList
 
 def access_verify(node,ScopeStack):
@@ -522,7 +517,6 @@ def writeParameters(params,open,close):
     global GENERATED
     GENERATED.write(open)
     for parameter in params:
-        print(parameter)
         if(isinstance(parameter,list)):
             firstElement=parameter[0]
             if(isinstance(firstElement,list)):
@@ -609,10 +603,8 @@ def writeListParams(listNode):
 def listElements(AST):
     elements=[]
     for element in AST.getChildren():
-        #print(element.getData())
         if(element.getData()=="LIST"):
             elements+=[listElements(element)]
         else:
             elements+=[element.getChildren()[0].getData()]
-    #print(elements)
     return elements
