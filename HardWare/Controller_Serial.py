@@ -343,14 +343,28 @@ def columnAccess(lista,index):
     return columnList
 
 def TEC():
-    serial_port.write("tec".encode('ascii'))
-    print(serial_port.readline().decode('ascii'))
-def HEART():
-    serial_port.write("heart".encode('ascii'))
-    print(serial_port.readline().decode('ascii'))
-def SMILE():
-    serial_port.write("smile".encode('ascii'))
+    msg = "tec"
+    res = ""
     while True:
-        print(serial_port.readline().decode('ascii'))
-
-SMILE()
+        if res != "":
+            break
+        serial_port.write(msg.encode('ascii'))
+        res = serial_port.readline().decode('ascii')
+def HEART():
+    msg = "heart"
+    res = ""
+    while True:
+        if res != "":
+            break
+        serial_port.write(msg.encode('ascii'))
+        res = serial_port.readline().decode('ascii')
+def SMILE():
+    msg = "smile"
+    res = ""
+    while True:
+        if res != "":
+            break
+        serial_port.write(msg.encode('ascii'))
+        res = serial_port.readline().decode('ascii')
+    
+BLINK(63,1,"Seg",1)

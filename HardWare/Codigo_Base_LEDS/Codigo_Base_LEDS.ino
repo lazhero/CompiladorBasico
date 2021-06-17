@@ -35,15 +35,82 @@ unsigned char blink_matrix[8][8] =
 
 unsigned char smile[8][8]=
 {  
-  0,0,0,0,0,0,0,0,  
-  0,0,1,0,0,1,0,0,  
-  0,0,1,0,0,1,0,0,  
-  0,0,1,0,0,1,0,0,  
-  0,0,0,0,0,0,0,0,  
-  0,1,0,0,0,0,1,0,  
   0,0,1,1,1,1,0,0,  
-  0,0,0,0,0,0,0,0,  
+  0,1,0,0,0,0,1,0,  
+  1,0,1,0,0,1,0,1,  
+  1,0,0,0,0,0,0,1,  
+  1,0,1,0,0,1,0,1,  
+  1,0,0,1,1,0,0,1,  
+  1,0,0,0,0,0,0,1,  
+  0,1,1,1,1,1,1,0,  
 };  
+unsigned char sad[8][8]=
+{  
+  0,0,1,1,1,1,0,0,  
+  0,1,0,0,0,0,1,0,  
+  1,0,1,0,0,1,0,1,  
+  1,0,0,0,0,0,0,1,  
+  1,0,0,0,0,0,0,1,  
+  1,0,0,1,1,0,0,1,  
+  1,0,1,0,0,1,0,1,  
+  0,1,1,1,1,1,1,0,  
+};  
+unsigned char T[8][8]=
+{  
+  1,1,1,1,1,1,1,1,  
+  1,1,1,1,1,1,1,1,  
+  0,0,0,1,1,0,0,0,  
+  0,0,0,1,1,0,0,0,  
+  0,0,0,1,1,0,0,0,  
+  0,0,0,1,1,0,0,0,  
+  0,0,0,1,1,0,0,0,  
+  0,0,0,1,1,0,0,0,  
+}; 
+unsigned char E[8][8]=
+{  
+  1,1,1,1,1,1,1,0,  
+  1,1,1,1,1,1,1,0,  
+  1,1,0,0,0,0,0,0,  
+  1,1,1,1,1,1,1,0,  
+  1,1,1,1,1,1,1,0,  
+  1,1,0,0,0,0,0,0,  
+  1,1,1,1,1,1,1,0,  
+  1,1,1,1,1,1,1,0,  
+}; 
+unsigned char C_letter[8][8]=
+{  
+  0,0,1,1,1,1,1,0,  
+  0,1,1,1,1,1,1,1,  
+  1,1,0,0,0,0,0,0,  
+  1,1,0,0,0,0,0,0,  
+  1,1,0,0,0,0,0,0,  
+  1,1,0,0,0,0,0,0,  
+  0,1,1,1,1,1,1,1,  
+  0,0,1,1,1,1,1,0,  
+};
+unsigned char corazon_grande[8][8]=
+{  
+  0,1,1,0,0,1,1,0,  
+  1,1,1,1,1,1,1,1,  
+  1,1,1,1,1,1,1,1,  
+  1,1,1,1,1,1,1,1,  
+  0,1,1,1,1,1,1,0,  
+  0,0,1,1,1,1,0,0,  
+  0,0,0,1,1,0,0,0,  
+  0,0,0,0,0,0,0,0,  
+};
+unsigned char corazon_peke[8][8]=
+{  
+  0,0,0,0,0,0,0,0,  
+  0,0,1,0,0,1,0,0,  
+  0,1,1,1,1,1,1,0,  
+  0,1,1,1,1,1,1,0,  
+  0,0,1,1,1,1,0,0,  
+  0,0,0,1,1,0,0,0,  
+  0,0,0,0,0,0,0,0,  
+  0,0,0,0,0,0,0,0,  
+};
+//corazon, carita, TEC
 void setup()  
 {  
 
@@ -149,7 +216,7 @@ void process_msg(String data){
     }
   }
   //Change function to excecute
-  if (data.substring(0,5) == "blink"){
+  else if (data.substring(0,5) == "blink"){
     String Time, time_unit, state;
     int index_coma= data.substring(6).indexOf(",");
     Time = data.substring(6,6+index_coma);
@@ -165,6 +232,23 @@ void process_msg(String data){
       clear_blink();
     }
   }
+  else if (data.substring(0,5) == "smile"){
+    process_array[0] = "smile";
+    process_array[1] = "0";
+    time_delay = 700;
+    Serial.println("2");
+  }else if (data.substring(0,3) == "tec"){
+    process_array[0] = "tec";
+    process_array[1] = "0";
+    time_delay = 700;
+    Serial.println("2");
+  }else if (data.substring(0,5) == "heart"){
+    process_array[0] = "heart";
+    process_array[1] = "0";
+    time_delay = 700;
+    Serial.println("2");
+  }
+  
 }
 void clear_blink(){
   process_array[0] = "";
@@ -199,15 +283,48 @@ void loop()
     data_rec = Serial.readString();
     process_array[0] = "";
     process_msg(data_rec);
-    //data_rec.toCharArray(Matrix_list, sizeof(Matrix_list));
-    //list_to_matrix();
   }
   if(!flag_filling){
     Time_counter+=1;
     delay(1);
+    //blink
     if(process_array[0] == "blink" && Time_counter >= time_delay){
       Time_counter = 0;
       _blink(true);
+    }
+    //smile animation
+    else if(process_array[0] == "smile" && Time_counter >= time_delay){
+      Time_counter = 0;
+      if (process_array[1] == "1"){
+        change_Matrix(smile);
+        process_array[1] = "0";
+      }else{
+        process_array[1] = "1";
+        change_Matrix(sad);
+      }
+    }
+    //
+    else if(process_array[0] == "tec"&& Time_counter >= time_delay){
+      Time_counter = 0;
+      if (process_array[1] == "0"){
+        change_Matrix(T);
+        process_array[1] = "1";
+      }else if(process_array[1] == "1"){
+        process_array[1] = "2";
+        change_Matrix(E);
+      }else{
+        process_array[1] = "0";
+        change_Matrix(C_letter);
+      }
+    }else if(process_array[0] == "heart" && Time_counter >= time_delay){
+      Time_counter = 0;
+      if (process_array[1] == "1"){
+        change_Matrix(corazon_grande);
+        process_array[1] = "0";
+      }else{
+        process_array[1] = "1";
+        change_Matrix(corazon_peke);
+      }
     }
     Display();
   }
