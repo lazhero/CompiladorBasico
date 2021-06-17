@@ -41,8 +41,9 @@ def SEMANTIC(AST,outputPath,currentPath):
     GENERATED.write(currentPath)
     GENERATED.write('"')
     GENERATED.write(")\n")
-    GENERATED.write("import ")
+    GENERATED.write("from ")
     GENERATED.write(HardWareFile)
+    GENERATED.write(" import *")
     GENERATED.write("\n")
     TABCOUNTER=0
     program(AST)
@@ -54,6 +55,8 @@ def program(AST):
         raise Exception("No main found")
     for i in AST.getChildren():
         procedure(i)
+    GENERATED.write("main()")
+    GENERATED.close()
 
 def procedure(AST):
     global MAIN_FLAG
