@@ -202,7 +202,7 @@ def PRINT_LED(col, row, value):
         raise Exception("Value is not valid")
     write_matrix_to_arduino(mat_to_send)
     
-def PRINT_LEDX(type,index,values):
+def PRINT_LED_X(type,index,values):
     helper = Led_Matrix()
     mat_to_send = helper.fill_matrix_val(0,0)
     if type == "F":
@@ -228,9 +228,12 @@ def PRINT_LEDX(type,index,values):
         raise Exception("ERROR EN TIPO DE OBJETO")
     write_matrix_to_arduino(mat_to_send) 
 
+def LIST(n):
+    return list(n)
+
 def test():
     BLINK(55,1000,"Mil",True)
 
-PRINT_LEDX("M",0,[[True , True , True, True, False, True, False, True],
+PRINT_LED_X("M",0,[[True , True , True, True, False, True, False, True],
 [True , True , True, True, True, True, True, True ],
 [False , False, False, True, True, True, True, True]])

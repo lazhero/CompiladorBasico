@@ -1,5 +1,5 @@
+
 from ast import Raise
-import re
 from descriptors import function_descriptor
 from const import reserved_function_names as prebuild
 from const import reserved_function_params as reserved_params
@@ -11,27 +11,40 @@ from const import reserved_special_object as special_object
 from const import valid_insertion_type as special_insertion
 from const import operators
 from stack import Stack
-
+#import Controller_Serial
 global TS,MAIN_FLAG, GENERATED, TABCOUNTER
 MAIN_FLAG=False
 
 
 TS={} #Table Symbol
-
+PATH="\Hardware"
+HardWareFile="Controller_Serial"
 ARGUMENTS="ARGUMENTS"
 PARAMETERS="PARAMETERS"
 ASSIGNMENT="ASSIGMENT"
 METHODCALL="METHOD_CALL"
 FUNCTIONCALL="CALL_FUNC"
+ACCESS="ACCESS"
 SCOPE="SCOPE"
 FOR="FOR"
 IF="IF"
-OUTPUTFILE="out.py"
-def SEMANTIC(AST,path):
-    global GENERATED, TABCOUNTER
-    GENERATED=open(path+"/"+OUTPUTFILE,"w")
-    TABCOUNTER=0
 
+OUTPUTFILE="out.py"
+def SEMANTIC(AST,outputPath,currentPath):
+    global GENERATED, TABCOUNTER
+    currentPath+=PATH
+    currentPath=currentPath.replace('"\"','"/"')
+    GENERATED=open(outputPath+"/"+OUTPUTFILE,"w")
+    GENERATED.write("import sys\n")
+    GENERATED.write("sys.path.append(r")
+    GENERATED.write('"')
+    GENERATED.write(currentPath)
+    GENERATED.write('"')
+    GENERATED.write(")\n")
+    GENERATED.write("import ")
+    GENERATED.write(HardWareFile)
+    GENERATED.write("\n")
+    TABCOUNTER=0
     program(AST)
 
 def program(AST):
@@ -79,6 +92,8 @@ def statement_classifier(statement,ScopeCount,ScopeStack):
         return FOR_STATEMENT(statement,ScopeCount,ScopeStack)
     if(StatementName==IF):
         return IF_statement(statement,ScopeCount,ScopeStack)
+    if(StatementName==ACCESS):
+        return ACCESS_statement(statement,ScopeCount,ScopeStack)
     else:
         return ScopeCount
 
@@ -106,8 +121,9 @@ def function_call(AST,ScopeCount,ScopeStack):
     valid_parameter_type(Parameters_requested,Parameters_given,FunctionName)
     evaluate_special_string(Parameters_requested,Parameters_values)
 
-    GENERATED.write((TABCOUNTER*"\t")+FunctionName)
-    writeParameters(Parameters_values,"(",")")
+    writeFunctionCall(FunctionName,Parameters_values)
+    #GENERATED.write((TABCOUNTER*"\t")+FunctionName)
+    #writeParameters(Parameters_values,"(",")")
     GENERATED.write("\n")
 
     return ScopeCount
@@ -124,9 +140,7 @@ def method_call(AST,ScopeCount,ScopeStack):
     valid_parameter_type(Parameters_requested,Parameters_given,MethodName)
     evaluate_special_string(Parameters_requested,Parameters_values)
     
-    GENERATED.write((TABCOUNTER*"\t")+MethodName)
-    params=[VarName]+Parameters_values
-    writeParameters(params,"(",")")
+    writeMethodCall(MethodName,VarName,Parameters_values)
     GENERATED.write("\n")
 
     return ScopeCount
@@ -152,6 +166,12 @@ def assignment(AST,ScopeCount,ScopeStack):
         assign_type="lista"
     elif(element_classifier=="IDENTIFIER"):
         assign_type=just_identifier(AST,ScopeStack)
+    elif(element_classifier==METHODCALL):
+        assign_type="METHODCALL"
+    elif(element_classifier==FUNCTIONCALL):
+        assign_type="FUNCTIONCALL"
+    elif(element_classifier==ACCESS):
+        assign_type="ACCESS"
     else:
         assign_type="NOT_DEFINED"
     final_type=valid_change(current_type,assign_type)
@@ -162,10 +182,19 @@ def assignment(AST,ScopeCount,ScopeStack):
     writeType=assign_type
     if(element_classifier in operators):
         writeType="MATH"
-    
-    GENERATED.write((TABCOUNTER*"\t")+varName+"=")
-    writeAssignment(AST,writeType)
-    GENERATED.write("\n")
+    if(writeType=="METHODCALL"):
+        GENERATED.write((TABCOUNTER*"\t")+varName+"=")
+        ScopeCount = method_call(AST.getChildren()[1],ScopeCount,ScopeStack)
+    elif(writeType=="FUNCTIONCALL"):
+        GENERATED.write((TABCOUNTER*"\t")+varName+"=")
+        ScopeCount = function_call(AST.getChildren()[1],ScopeCount,ScopeStack)
+    elif(writeType=="ACCESS"):
+        GENERATED.write((TABCOUNTER*"\t")+varName+"=")
+        ScopeCount = ACCESS_statement(AST.getChildren()[1],ScopeCount,ScopeStack)
+    else:
+        GENERATED.write((TABCOUNTER*"\t")+varName+"=")
+        writeAssignment(AST,writeType,ScopeStack)
+        GENERATED.write("\n")
     return ScopeCount
 
 def FOR_STATEMENT(AST,ScopeCount,ScopeStack):
@@ -195,7 +224,7 @@ def IF_statement(AST,ScopeCount,ScopeStack):
     compared_value = AST.getChildren()[0].getChildren()[2].getChildren()[0].getData()
     compared_type=AST.getChildren()[0].getChildren()[2].getData()
     if_scope=AST.getChildren()[1]
-    print(AST.getChildren()[2].getChildren())
+    #print(AST.getChildren()[2].getChildren())
     else_scope=AST.getChildren()[2].getChildren()[0]
     if (compared_type == 'IDENTIFIER'):
         compared_type=find_var_type(compared_value,ScopeStack)
@@ -215,6 +244,13 @@ def IF_statement(AST,ScopeCount,ScopeStack):
 
     return scope(else_scope,ScopeCount,ScopeStack)
 
+
+def ACCESS_statement(AST,ScopeCount,ScopeStack):
+    varName=get_identifier(AST)
+    accessElements=setting_access(AST.getChildren()[1:],ScopeStack)
+    writeAccess(varName,accessElements)
+
+    return ScopeCount
 
 def just_math_expression(AST,ScopeStack):
     elements=get_operands(AST.getChildren()[1])
@@ -243,10 +279,14 @@ def validate_expression(operands_list,Scope_Stack):
             element_class=just_identifier(operand,Scope_Stack)
             if(element_class=="NOT_DEFINED"):
                 return element_class
+            elif(element_class=="METHODCALL"):
+                return element_class
+            elif(element_class=="FUNCTIONCALL"):
+                return element_class
         elif(element_class==FUNCTIONCALL):
-            return "NOT_DEFINED"
+            return "FUNCTIONCALL"
         elif(element_class==METHODCALL):
-            return "NOT_DEFINED"
+            return "METHODCALL"
         
         expression_type=valid_change(expression_type,element_class)
         if(expression_type==None):
@@ -259,6 +299,10 @@ def valid_change(type1,type2):
     if(type2==None):
         return type1
     if(type1=="NOT_DEFINED" or type2=="NOT_DEFINED"):
+        return type1
+    if(type1=="METHODCALL" or type2=="METHODCALL"):
+        return type1
+    if(type1=="FUNCTIONCALL" or type2=="FUNCTIONCALL"):
         return type1
     if(type1==type2):
         return type1
@@ -284,7 +328,7 @@ def find_var_type(VarName,Scope):
     try: 
         return TS[('main'),VarName]
     except(KeyError):
-        except_string='Variable: '+VarName+" not defined previoustly"
+        except_string='Variable: '+str(VarName)+" not defined previously"
         raise Exception(except_string)
 
 def procedure_setting(AST):
@@ -313,12 +357,22 @@ def parameters_type_func_call(AST,ScopeStack):
         else:
             Parameters+=[[ParameterType]]
     return Parameters
+
 def parameters_value_func_call(AST,ScopeStack):
     Parameters=[]
+    #print(AST.getData())
     for Parameter in AST.getChildren():
-        ParameterValue=Parameter.getChildren()[0].getData()
+        value= Parameter.getData()
+        
+        if(value==FUNCTIONCALL):
+            functionName=get_identifier(Parameter)
+            ParameterValue=parameters_value_func_call(Parameter.getChildren()[1],ScopeStack)
+            ParameterValue=[functionName]+ParameterValue
+        else:
+            ParameterValue=Parameter.getChildren()[0].getData()
         Parameters+=[ParameterValue]
     return Parameters
+
 def evaluate_special_string(requestedParameters,givenValues):
     current_types=None
     current_value=None
@@ -328,11 +382,11 @@ def evaluate_special_string(requestedParameters,givenValues):
         current_value=givenValues[i]
         if(len(current_types)==1):
             current_type=current_types[0]
-            match_special_types(current_type,current_value)
-            
-    
+            match_special_types(current_type,current_value)    
 
 def match_special_types(varType,value):
+    if(isinstance(value,list)):
+        return 
     if(varType=="RESERVERD_SPECIAL_TIME"):
         if(value not in special_time):
             special_type_exception(value,varType)
@@ -343,10 +397,6 @@ def match_special_types(varType,value):
         if(value not in special_insertion):
             special_type_exception(value,varType)
     
-
-
-
-
 def special_type_exception(value,varType):
     raise Exception("The "+str(value)+" doesnt match with the "+varType+" requested")
         
@@ -377,17 +427,21 @@ def valid_parameter_type(requested_param,given_param, name):
         for j in range(len(given_param[i])):
             focus_type=transform_value(given_param[i][j])
             requested_params=requested_param[i]
-            print(focus_type)
+            #print(focus_type)
             if(focus_type=="STRING"):
                 continue
             if('valid_insertion'== requested_params[0]):
+                continue
+            if(focus_type==METHODCALL):
+                continue
+            if(focus_type==FUNCTIONCALL):
                 continue
             if(focus_type not in requested_params):
                 raise Exception("The var params types in "+name+"  doesnt match")
 
 def valid_caller(varName,MethodName,ScopeStack):
     varType=find_var_type(varName,ScopeStack)
-    if(varType!="NOT_DEFINED"):
+    if(varType!="NOT_DEFINED" and varType!="FUNCTIONCALL" and varType!="METHODCALL"):
         if(varType not in valid_caller_dic[MethodName]):
             raise Exception("No valid caller "+varName+" to method "+ MethodName)
 
@@ -412,10 +466,40 @@ def prebuild_setting():
 def in_TS(id_tuple):
     return id_tuple in TS.keys()
 
+def setting_access(AST,ScopeStack):
+    #[['RANGE', ['INTEGER', 1], ['INTEGER', 2]], ['SINGLE', ['IDENTIFIER', 'varxx']]]
+    #[[1,":",2],[2]]
+    accessList=[]
+    for i in AST:
+        accessType=i.getData()
+        print(accessType)
+        if(accessType=="SINGLE"):
+            firstAccess=i.getChildren()[0]
+            access_verify(firstAccess,ScopeStack)
+            accessList+=[str(firstAccess.getChildren()[0].getData())]
+            print(accessList)
+        elif(accessType=="RANGE"):
+            firstAccess=i.getChildren()[0]
+            secondAccess=i.getChildren()[1]
+            access_verify(firstAccess,ScopeStack)
+            access_verify(secondAccess,ScopeStack)
+            accessList+=[str(firstAccess.getChildren()[0].getData())+":"+str(secondAccess.getChildren()[0].getData())]
+    print(accessList)
+    return accessList
+
+def access_verify(node,ScopeStack):
+    nodeType=node.getData()
+    if(nodeType=="IDENTIFIER"):
+        nodeName=node.getChildren()[0].getData()
+        find_var_type(nodeName,ScopeStack)
+
+
 def get_identifier(AST):
     return AST.getChildren()[0].getChildren()[0].getData()
+
 def var_to_TS(ScopeStack,varName,dataType):
     TS[tuple(ScopeStack.stack_to_list()),varName]=dataType
+
 
 
 ### GENERATOR FILE FUNCTIONS ###
@@ -424,17 +508,22 @@ def writeParameters(params,open,close):
     global GENERATED
     GENERATED.write(open)
     for parameter in params:
-        GENERATED.write(str(parameter))
-        GENERATED.write(",")
+        if(isinstance(parameter,list)):
+            GENERATED.write(str(parameter[0]))
+            writeParameters(parameter[1:],open,close)
+        else:
+            GENERATED.write(str(parameter))
+            GENERATED.write(",")
     GENERATED.write(close)
 
-def writeAssignment(AST,classifier):
+def writeAssignment(AST,classifier,ScopeStack):
     assigned=AST.getChildren()[1]
     if(classifier=="MATH"):
         writeMath(assigned)
     elif(classifier=="lista"):
         elements=listElements(assigned)
         writeParameters(elements,"[","]")
+    
     else:
         GENERATED.write(str(assigned.getChildren()[0].getData()))
 
@@ -448,6 +537,24 @@ def writeMath(AST):
         GENERATED.write(")")
     else:
         GENERATED.write(str(AST.getChildren()[0].getData()))
+
+def writeFunctionCall(FunctionName,Parameters_values):
+    GENERATED.write((TABCOUNTER*"\t")+FunctionName)
+    writeParameters(Parameters_values,"(",")")
+    
+def writeMethodCall(MethodName,VarName,Parameters_values):
+    GENERATED.write((TABCOUNTER*"\t")+MethodName)
+    params=[VarName]+Parameters_values
+    writeParameters(params,"(",")")
+
+def writeAccess(varName,accessElements):
+    GENERATED.write((TABCOUNTER*"\t"))
+    GENERATED.write(varName)
+    for element in accessElements:
+        GENERATED.write("[")
+        GENERATED.write(str(element))
+        GENERATED.write("]")
+    GENERATED.write("\n")
 
 def listElements(AST):
     elements=[]

@@ -1,7 +1,13 @@
 Procedure main(int carajo,int pene){
    milista=[True,False];
-   milista.Neg;
+   varxx=2;
+   ##milista[0];
+   ##milista[0][2];
+   p=milista[1:varxx][0];
+   a=milista.Neg;
+   b=printLedX("C",1,milista);
    x=3;
+   x=list(range(5,True));
    if x>5{
       x=4;
    }

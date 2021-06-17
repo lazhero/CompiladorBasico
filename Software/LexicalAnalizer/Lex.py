@@ -187,6 +187,13 @@ def p_final_param_list(p):
 def p_final_param_expression(p):
     'final_param : expression'
     p[0]=p[1]
+def p_final_param_functioncall(p):
+    'final_param : functioncall'
+    p[0]=p[1]
+def p_final_param_accesslist(p):
+    'final_param : access_list'
+    p[0]=p[1]
+
 
 def p_statement_scope(p):
     'statement : scope'
@@ -272,7 +279,9 @@ def p_statement_assign_list(p):
 def p_statement_assing_method(p):
     'statement : IDENTIFIER INSTANCE methodcall EOL'
     p[0]=["ASSIGMENT",["IDENTIFIER",p[1]],p[3]]
-
+def p_statement_assing_function(p):
+    'statement : IDENTIFIER INSTANCE functioncall EOL'
+    p[0]=["ASSIGMENT",["IDENTIFIER",p[1]],p[3]]
 def p_statement_expression(p):
     'statement : expression EOL'
     p[0]=p[1]
