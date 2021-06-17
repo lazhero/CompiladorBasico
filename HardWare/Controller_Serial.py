@@ -336,5 +336,11 @@ def DELETE(matrix, index, type):
             return matrix
     raise Exception("INIDICE NO ES VALIDO")
 
-print(DELETE([[1,2,3,4],[9,10,11,12],[5,6,7]],3,1))
+def columnAccess(lista,index):
+    columnList=[]
+    for i in range(len(lista)):
+        columnList+=lista[i][index]
+    return columnList
+
+
 
