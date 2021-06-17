@@ -1,6 +1,9 @@
 import serial, time
+try:
+    serial_port = serial.Serial('COM3',baudrate=57600, timeout=1)
+except:
+    print("NO SE CONECTO EL ARDUINO")
 
-serial_port = serial.Serial('COM3',baudrate=57600, timeout=1)
 class Led_Matrix:
     matrix = [[0, 0, 1, 0, 0, 1, 0, 0],
               [0, 1, 1, 1, 1, 1, 1, 0],
@@ -143,7 +146,7 @@ def write_matrix_to_arduino(matrix):
             break
         msg = "fill_matrix,"+str(row)+","
         for i in range(0,8):
-            msg = msg+str(matrix[row][i])
+            msg = msg+str(int(matrix[row][i]))
         serial_port.write(msg.encode('ascii'))
         data_rec = serial_port.readline().decode('ascii')
     
@@ -246,7 +249,7 @@ def INSERT(matrix, boolean_list,type,index):
             if i < index:
                 new_matrix[i] = matrix[i]
             elif i == index:
-                new_matrix = bool_list
+                new_matrix[i] = bool_list
             else:
                 try:
                     new_matrix[i] = matrix[i-1]
@@ -268,8 +271,10 @@ def INSERT(matrix, boolean_list,type,index):
                         for r in new_matrix:
                             r.append(0)
                         new_matrix[i][j] = matrix[i][j-1]
-    return new_matrix
+    for r in new_matrix:
+        while len(r)<8:
+            r.append(0)
+    return helper.fill_matrix_aux(new_matrix)
 
-
-print(INSERT([[True , True , True],[False , False ,False]], [False , False ,False],0,0))
+print(INSERT([[True , True , True],[False , False ,False]], [True , False ,False],0,0))
 
