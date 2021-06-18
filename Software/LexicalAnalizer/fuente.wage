@@ -1,8 +1,6 @@
 Procedure main(){
 	matrix = [[True,True,True],[True,False,True],[True,False,False]];
-	matrix.shapeF;
-	##var = [];
-	var=2;
+	var = matrix.Neg;
 	pollo(var);
 }
 
@@ -17,6 +15,7 @@ Procedure pollo(lista matrix){
 	delay(10,"Seg");
 	blink(mat,2,"Seg",False);
 }
+
 
 
 

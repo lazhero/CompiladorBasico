@@ -152,6 +152,7 @@ def write_matrix_to_arduino(matrix):
         serial_port.write(msg.encode('ascii'))
         data_rec = serial_port.readline().decode('ascii')
     
+    
 def BLINK(data, time, time_unit, state):
     helper = Led_Matrix()
     matrix_to_send = helper.fill_matrix(data)
@@ -186,7 +187,7 @@ def DELAY(_time, time_unit):
         raise Exception("NOT VALID TIME_UNIT")
 
 def NEG(data):
-    if isinstance(data, bool):
+    if isinstance(data, bool) or isinstance(data, int):
         return not data
     elif isinstance(data, list):
         res = []
@@ -294,24 +295,24 @@ def SHAPE_F(matrix):
 def SHAPE_C(matrix):
     return len(matrix[0])
 
-def T(data):
+def T_METHOD(data):
     if isinstance(data,bool):
         return True
     else:
         for i in range(0,len(data)):
             if isinstance(data[i],list):
-                T(data[i])
+                T_METHOD(data[i])
             else:
                 data[i] = True
         return data
 
-def F(data):
+def F_METHOD(data):
     if isinstance(data,bool):
         return False
     else:
         for i in range(0,len(data)):
             if isinstance(data[i],list):
-                T(data[i])
+                F_METHOD(data[i])
             else:
                 data[i] = False
         return data
@@ -366,3 +367,4 @@ def SMILE():
             break
         serial_port.write(msg.encode('ascii'))
         res = serial_port.readline().decode('ascii')
+
