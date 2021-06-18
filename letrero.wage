@@ -34,7 +34,7 @@ Procedure main(){
          [True,True,False,False,False,False,False,False],
          [True,True,True,True,True,True,True,True],
          [True,True,True,True,True,True,True,True]];
-
+    
     pass_word(A);
     pass_word(L);
     pass_word(C);
@@ -54,12 +54,14 @@ Procedure pass_word(lista matrix){
          [False,False,False,False,False,False,False,False]];
     for var in 8 {
         printLedX("M", 0, mat);
-        mat.delete(0,1);
+        mat.delete(0,0);
         lis = matrix[var];
-        mat.insert(lis,1,7);
+        mat.insert(lis,0,7);
     }
-    ##printLedX("M", 0, mat);
+    printLedX("M", 0, mat);
 }
+
+
 
 
 
