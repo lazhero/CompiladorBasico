@@ -40,18 +40,25 @@ Procedure main(){
     pass_word(C);
     pass_word(E);
 
+
 }
 
 Procedure pass_word(lista matrix){
-    mat = matrix;
+     mat= [[False,False,False,False,False,False,False,False],
+         [False,False,False,False,False,False,False,False],
+         [False,False,False,False,False,False,False,False],
+         [False,False,False,False,False,False,False,False],
+         [False,False,False,False,False,False,False,False],
+         [False,False,False,False,False,False,False,False],
+         [False,False,False,False,False,False,False,False],
+         [False,False,False,False,False,False,False,False]];
     for var in 8 {
         printLedX("M", 0, mat);
         mat.delete(0,1);
-        lis = [False,False,False,False,False,False,False,False];
+        lis = matrix[var];
         mat.insert(lis,1,7);
-        delay(700, "Mil");
     }
-    printLedX("M", 0, mat);
+    ##printLedX("M", 0, mat);
 }
 
 
