@@ -190,30 +190,32 @@ void process_msg(String data){
   //Fill the matrix
   if(data.substring(0,11)=="fill_matrix"){
     time_delay = 1;
+    int part = data.substring(12,13).toInt();
     int row = data.substring(12,13).toInt();
-    char mat_data[16] = {0};
-    data.substring(14,22).toCharArray(mat_data,16);
-    for(int i = 0;i<8;i++){
-      Matrix[row][i] = mat_data[i]-'0';
-    }if (row == 0){
+    char mat_data[48] = {0};
+    data.substring(14).toCharArray(mat_data,48);
+    if(part == 0){
+      for(int i = 0;i<4;i++){
+        for(int j = 0;j<8;j++){
+          Matrix[i][j] = mat_data[i*8+j]-'0';
+        }
+      }
       flag_filling = true;
+      
       Serial.println("1");
-    }else if(row == 1){
-      Serial.println("2");
-    }else if(row == 2){
-      Serial.println("3");
-    }else if(row == 3){
-      Serial.println("4");
-    }else if(row == 4){
-      Serial.println("5");
-    }else if(row == 5){
-      Serial.println("6");
-    }else if(row == 6){
-      Serial.println("7");
-    }else if(row == 7){
-      flag_filling = false;
-      Serial.println("8");
+      Serial.flush();
     }
+    else if(part == 1){
+      for(int i = 4;i<8;i++){
+        for(int j = 0;j<8;j++){
+          Matrix[i][j] = mat_data[(i-4)*8+j]-'0';
+        }
+      }
+      Serial.print("8");
+      Serial.flush();
+      flag_filling = false;
+    }
+    
   }
   //Change function to excecute
   else if (data.substring(0,5) == "blink"){
