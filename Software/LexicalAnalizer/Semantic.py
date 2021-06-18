@@ -112,7 +112,12 @@ def scope(AST,ScopeCount,ScopeStack):
         MAIN_FLAG=True
     ScopeCount += 1
     TABCOUNTER += 1
-    ScopeCount = process_children(AST,ScopeCount,ScopeStack)
+    ChildrenLen=len(AST.getChildren())
+    if(ChildrenLen>0):
+        ScopeCount = process_children(AST,ScopeCount,ScopeStack)
+    else:
+        GENERATED.write(TABCOUNTER*"\t")
+        GENERATED.write("pass\n")
     ScopeStack.pop()
     TABCOUNTER -= 1
     return ScopeCount
@@ -223,21 +228,29 @@ def assignment(AST,ScopeCount,ScopeStack):
 def FOR_STATEMENT(AST,ScopeCount,ScopeStack):
     iterable=get_identifier(AST)
     source=get_identifier(AST.getChildren()[1])
+    classifier=AST.getChildren()[1].getChildren()[0].getData()
+
     try:
         find_var_type(iterable,ScopeStack)
     except:
         var_to_TS(ScopeStack,iterable,"bool")
     else:
         raise Exception("The variable "+iterable+ " has been defined previously")
-    varType=find_var_type(source,ScopeStack)
-    if(varType!="lista"):
+    if(classifier!="INTEGER"):
+         varType=find_var_type(source,ScopeStack)
+    if(classifier=="IDENTIFIER" and varType!="lista"):
         raise Exception("The "+source+" must be a list")
     for_scope = AST.getChildren()[3]
     step=AST.getChildren()[2].getChildren()[0].getChildren()[0].getData()
     GENERATED.write((TABCOUNTER*"\t")+"for ")
-    GENERATED.write("uniquei in range(0,len("+source+"),"+str(step)+"):\n")
-    GENERATED.write((TABCOUNTER+1)*"\t")
-    GENERATED.write(iterable+"="+source+"[uniquei]\n")
+    if(classifier!="INTEGER"):
+        GENERATED.write("uniquei in range(0,len("+source+"),"+str(step)+"):\n")
+        GENERATED.write((TABCOUNTER+1)*"\t")
+        GENERATED.write(iterable+"="+str(source)+"[uniquei]")
+    else:
+        GENERATED.write("uniquei in range(0,"+str(source)+","+str(step)+"):\n")
+        GENERATED.write((TABCOUNTER+1)*"\t")
+    GENERATED.write("\n")  
     count=scope(for_scope,ScopeCount,ScopeStack)
     return count
 

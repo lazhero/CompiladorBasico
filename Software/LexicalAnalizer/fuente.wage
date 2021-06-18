@@ -1,8 +1,8 @@
 Procedure main(){
 	matrix = [[True,True,True],[True,False,True],[True,False,False]];
 	matrix.shapeF;
-	##var = [];
-	var=2;
+	var = [];
+	##var=2;
 	pollo(var);
 }
 
@@ -16,6 +16,12 @@ Procedure pollo(lista matrix){
 	blink(mat,2,"Seg",True);
 	delay(10,"Seg");
 	blink(mat,2,"Seg",False);
+	listp=[True];
+	for i in 10{
+		hola=2;
+		hola=3;
+
+	}
 }
 
 
