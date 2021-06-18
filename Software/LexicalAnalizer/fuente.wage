@@ -1,6 +1,7 @@
 Procedure main(){
 	matrix = [[True],[True],[True]];
-  	matrix.Neg();
+	matrix.shapeF;
+	pene=matrix[1][2].Neg;
 }
 
 

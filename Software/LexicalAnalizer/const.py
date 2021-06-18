@@ -109,5 +109,5 @@ method_valid_params_types={
 valid_insertion_type=[0,1]
 reserved_special_time=[ '"Seg"','"Min"','"Mil"']
 reserved_special_object=[ '"F"', '"C"','"M"',]
-
+NoautoPercetivesMethods=["SHAPE_F","SHAPE_C"]
 operators=['+','*','**','/','//','-']

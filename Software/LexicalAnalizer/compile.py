@@ -28,4 +28,4 @@ def compile_and_run(filename):
     print(error)
 if __name__ == '__main__':
     globals()[sys.argv[1]](sys.argv[2])
-#compile("C:/Users/allva/Desktop/LedAnimator/Software/LexicalAnalizer/fuente.wage")
+#compile("/home/lazh/TecnologicoCostaRica/QuintoSemestre/Compi/LedAnimator/LedAnimator/Software/LexicalAnalizer/fuente.wage")

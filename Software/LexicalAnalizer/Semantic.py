@@ -9,6 +9,7 @@ from const import method_valid_caller as valid_caller_dic
 from const import reserved_special_time as special_time
 from const import reserved_special_object as special_object
 from const import valid_insertion_type as special_insertion
+from const import NoautoPercetivesMethods as DONT_ASSIGNT
 from const import operators
 from stack import Stack
 #import Controller_Serial
@@ -133,9 +134,18 @@ def function_call(AST,ScopeCount,ScopeStack):
     return ScopeCount
 
 def method_call(AST,ScopeCount,ScopeStack):
+    CallerClassifier=AST.getChildren()[0].getData()
     VarName=get_identifier(AST)
     MethodName=AST.getChildren()[1].getChildren()[0].getData()
     MethodName=prebuild_method[MethodName]
+    AccessList=[]
+    if(CallerClassifier=="ACCESS"):
+        AccessNode=AST.getChildren()[0]
+    
+        VarName=get_identifier(AccessNode)
+        AccessList=setting_access(AccessNode.getChildren(),ScopeStack)
+       
+
     valid_caller(VarName,MethodName,ScopeStack)
     Parameters_Node=AST.getChildren()[2]
     Parameters_given=parameters_type_func_call(Parameters_Node,ScopeStack)
@@ -143,8 +153,12 @@ def method_call(AST,ScopeCount,ScopeStack):
     Parameters_values=parameters_value_func_call(Parameters_Node,ScopeStack)
     valid_parameter_type(Parameters_requested,Parameters_given,MethodName)
     evaluate_special_string(Parameters_requested,Parameters_values)
-    
-    writeMethodCall(MethodName,VarName,Parameters_values)
+
+    if(MethodName not in DONT_ASSIGNT):
+        GENERATED.write("\t"*TABCOUNTER)
+        GENERATED.write(VarName)
+        GENERATED.write("=")
+    writeMethodCall(MethodName,VarName,AccessList,Parameters_values)
     GENERATED.write("\n")
 
     return ScopeCount
@@ -251,7 +265,9 @@ def IF_statement(AST,ScopeCount,ScopeStack):
 def ACCESS_statement(AST,ScopeCount,ScopeStack):
     varName=get_identifier(AST)
     accessElements=setting_access(AST.getChildren()[1:],ScopeStack)
+    GENERATED.write((TABCOUNTER*"\t"))
     writeAccess(varName,accessElements)
+    GENERATED.write("\n")
 
     return ScopeCount
 
@@ -445,6 +461,7 @@ def valid_parameter_type(requested_param,given_param, name):
                 raise Exception("The var params types in "+name+"  doesnt match")
 
 def valid_caller(varName,MethodName,ScopeStack):
+   
     varType=find_var_type(varName,ScopeStack)
     if(varType!="NOT_DEFINED" and varType!="FUNCTIONCALL" and varType!="METHODCALL"):
         if(varType not in valid_caller_dic[MethodName]):
@@ -494,7 +511,7 @@ def setting_access(AST,ScopeStack):
         elif(accessType=="COLUMN"):
             firstAccess=i.getChildren()[0]
             access_verify(firstAccess,ScopeStack)
-            function="columnAccess("
+            function="columnAccess"
             accessList+=[[firstAccess.getChildren()[0].getData()]]
     return accessList
 
@@ -572,13 +589,20 @@ def writeFunctionCall(FunctionName,Parameters_values):
     GENERATED.write((TABCOUNTER*"\t")+FunctionName)
     writeParameters(Parameters_values,"(",")")
     
-def writeMethodCall(MethodName,VarName,Parameters_values):
+def writeMethodCall(MethodName,VarName,ACCESS,Parameters_values):
     GENERATED.write((TABCOUNTER*"\t")+MethodName)
-    params=[VarName]+Parameters_values
-    writeParameters(params,"(",")")
+    GENERATED.write("(")
+    GENERATED.write(VarName)
+    writeAccess("",ACCESS)
+    params=Parameters_values
+    writeParameters(params,"",")")
 
 def writeAccess(varName,accessElements):
-    GENERATED.write((TABCOUNTER*"\t"))
+    if(not isinstance(accessElements,list)):
+        return
+    if(len(accessElements)<=0):
+        return
+    #GENERATED.write((TABCOUNTER*"\t"))
     element0=accessElements[0]
     if(isinstance(element0,list)):
             GENERATED.write("columnAccess(")
@@ -594,7 +618,7 @@ def writeAccess(varName,accessElements):
         GENERATED.write(str(element))
         GENERATED.write("]")
     
-    GENERATED.write("\n")
+    #GENERATED.write("\n")
 
 def writeListParams(listNode):
     elements=listElements(listNode)
