@@ -11,5 +11,12 @@ def main():
 	pass_word(C,)
 	pass_word(E,)
 def pass_word(matrix,):
-	varFor=[True,True,True,True,True,True,True,True,]
-	mat=
+	mat=matrix
+	for var in range(0,8,1):
+		
+		PRINT_LED_X("M",0,mat,)
+		mat=		DELETE(mat,0,1,)
+		lis=[False,False,False,False,False,False,False,False,]
+		mat=		INSERT(mat,lis,1,7,)
+		DELAY(700,"Mil",)
+main()

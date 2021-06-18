@@ -43,16 +43,17 @@ Procedure main(){
 }
 
 Procedure pass_word(lista matrix){
-    varFor = [True,True,True,True,True,True,True,True];
     mat = matrix;
-    for var in varFor {
+    for var in 8 {
         printLedX("M", 0, mat);
-        mat.delete(7,1);
+        mat.delete(0,1);
         lis = [False,False,False,False,False,False,False,False];
-        mat.insert(lis,0,1);
-        delay(2, "Seg");
+        mat.insert(lis,1,7);
+        delay(700, "Mil");
     }
-    delay(2,"Seg");
+    printLedX("M", 0, mat);
 }
+
+
 
 

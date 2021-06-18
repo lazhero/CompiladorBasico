@@ -509,7 +509,7 @@ def lex_syntx(filename):
     result = parser.parse(s,lexer=mylexer)
     myTree=None
     if(result!=None):
-        print(result)
+        #print(result)
         myTree = create_tree_from_list(result)
     if(len(Syntax_errors)>0):
         for error in Syntax_errors:

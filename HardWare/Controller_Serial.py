@@ -136,7 +136,6 @@ class Led_Matrix:
 
 def write_matrix_to_arduino(matrix):
     part = 0
-    row = 0
     data_rec = ""
     while data_rec != "8":
         if data_rec == "8\n":
@@ -145,7 +144,7 @@ def write_matrix_to_arduino(matrix):
             part = int(data_rec)
         except:
             pass
-        if part == 8:
+        if part >= 8:
             break
         msg = "fill_matrix,"+str(part)+","
         if part == 0:
@@ -272,7 +271,7 @@ def INSERT(matrix, boolean_list,type,index):
             for j in range(0, len(matrix[i])+1):
                 if j < index:
                     new_matrix[i][j] = matrix[i][j]
-                elif i == index:
+                elif j == index:
                     new_matrix[i][j] = bool_list[j]
                 else:
                     try:
@@ -379,5 +378,3 @@ def SMILE():
         serial_port.write(msg.encode('ascii'))
         serial_port.flush()
         res = serial_port.readline().decode('ascii')
-msg = range(0,8)
-print(msg)

@@ -254,7 +254,7 @@ def FOR_STATEMENT(AST,ScopeCount,ScopeStack):
         GENERATED.write((TABCOUNTER+1)*"\t")
         GENERATED.write(iterable+"="+str(source)+"[uniquei]")
     else:
-        GENERATED.write("uniquei in range(0,"+str(source)+","+str(step)+"):\n")
+        GENERATED.write(iterable+" in range(0,"+str(source)+","+str(step)+"):\n")
         GENERATED.write((TABCOUNTER+1)*"\t")
     GENERATED.write("\n")  
     count=scope(for_scope,ScopeCount,ScopeStack)
@@ -473,8 +473,6 @@ def valid_parameter_type(requested_param,given_param, name):
         for j in range(len(given_param[i])):
             focus_type=transform_value(given_param[i][j])
             requested_params=requested_param[i]
-            print(focus_type)
-            print(requested_params)
             if(focus_type=="STRING"):
                 continue
             if('valid_insertion'== requested_params[0] or 'ANY' == requested_params[0]):
@@ -659,12 +657,9 @@ def writeListParams(listNode):
 
 def listElements(AST):
     elements=[]
-    print("mi nombre es ")
-    print(AST.getData())
     for element in AST.getChildren():
         if(element.getData()=="LIST"):
             elements+=[listElements(element)]
         else:
-            print(element.getData())
             elements+=[element.getChildren()[0].getData()]
     return elements
