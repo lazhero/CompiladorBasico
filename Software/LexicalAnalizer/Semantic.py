@@ -156,8 +156,13 @@ def method_call(AST,ScopeCount,ScopeStack):
 
     if(MethodName not in DONT_ASSIGNT):
         GENERATED.write("\t"*TABCOUNTER)
-        GENERATED.write(VarName)
-        GENERATED.write("=")
+        if(len(AccessList)):
+            GENERATED.write(VarName)
+            writeAccess("",AccessList)
+            GENERATED.write("=")
+        else:
+            GENERATED.write(VarName)
+            GENERATED.write("=")
     writeMethodCall(MethodName,VarName,AccessList,Parameters_values)
     GENERATED.write("\n")
 
@@ -597,7 +602,8 @@ def writeMethodCall(MethodName,VarName,ACCESS,Parameters_values):
     GENERATED.write((TABCOUNTER*"\t")+MethodName)
     GENERATED.write("(")
     GENERATED.write(VarName)
-    GENERATED.write(",")
+    if(len(ACCESS)<=0):
+        GENERATED.write(",")
     writeAccess("",ACCESS)
     params=Parameters_values
     writeParameters(params,"",")")
