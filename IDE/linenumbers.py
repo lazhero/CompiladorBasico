@@ -3,6 +3,7 @@ from tkinter import *
 from tkinter import filedialog
 from tkinter import font
 import subprocess
+from threading import Thread
 import os
 import pathlib
 
@@ -37,8 +38,8 @@ class ScrollText(tk.Frame):
 
         run_menu = Menu(my_menu, tearoff=False)
         my_menu.add_cascade(label="Run", menu=run_menu)
-        run_menu.add_command(label="Compile", command=self.compile)
-        run_menu.add_command(label="Run and compile", command=self.run)
+        run_menu.add_command(label="Compile", command=self.compile_thread)
+        run_menu.add_command(label="Run and compile", command=self.run_thread)
 
         self.text.bind("<Key>", self.onPressDelay)
         self.text.bind("<Button-1>", self.numberLines.redraw)
@@ -146,6 +147,14 @@ class ScrollText(tk.Frame):
             
         else:
             self.open_file(FALSE)
+    def compile_thread(self):
+        compile_thread=Thread(target=self.compile)
+        compile_thread.start()
+
+    def run_thread(self):
+        run_thread=Thread(target=self.run)
+        run_thread.start()
+
 
 
 '''THIS CODE IS CREDIT OF Bryan Oakley (With minor visual modifications on my side): 
