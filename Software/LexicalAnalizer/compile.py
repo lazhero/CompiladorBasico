@@ -3,7 +3,7 @@ import subprocess
 import os
 from Lex import lex_syntx 
 from Semantic import SEMANTIC
-sys.tracebacklimit = 0
+#sys.tracebacklimit = 0
 def compile(filename):
     print(filename)
     currentPath=os.path.abspath(__file__)
@@ -26,6 +26,6 @@ def compile_and_run(filename):
     output, error = process.communicate()
     print(output)
     print(error)
-if __name__ == '__main__':
-    globals()[sys.argv[1]](sys.argv[2])
-#compile("/home/lazh/TecnologicoCostaRica/QuintoSemestre/Compi/LedAnimator/LedAnimator/Software/LexicalAnalizer/fuente.wage")
+#if __name__ == '__main__':
+#   globals()[sys.argv[1]](sys.argv[2])
+compile("D:/Github Repositorios/LedAnimator/letrero.wage")

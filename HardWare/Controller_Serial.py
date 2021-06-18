@@ -379,8 +379,5 @@ def SMILE():
         serial_port.write(msg.encode('ascii'))
         serial_port.flush()
         res = serial_port.readline().decode('ascii')
-
-inicio = time.time()
-BLINK([[1,1,1,1,0,1,0,1],[1,1,1,1,0,0,0,1]],1,"Seg",1)
-fin = time.time()
-print(fin-inicio)
+msg = range(0,8)
+print(msg)
