@@ -457,6 +457,8 @@ def valid_parameter_type(requested_param,given_param, name):
                 continue
             if(focus_type==FUNCTIONCALL):
                 continue
+            if(focus_type=="ACCESS"):
+                continue
             if(focus_type not in requested_params):
                 raise Exception("The var params types in "+name+"  doesnt match")
 
