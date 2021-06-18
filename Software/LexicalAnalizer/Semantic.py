@@ -128,7 +128,10 @@ def function_call(AST,ScopeCount,ScopeStack):
         FunctionName=prebuild[FunctionName]
     Parameters_Node=AST.getChildren()[1]
     Parameters_given=parameters_type_func_call(Parameters_Node,ScopeStack)
-    Parameters_requested=TS[FunctionName]
+    try:
+        Parameters_requested=TS[FunctionName]
+    except:
+        raise Exception("the function "+FunctionName+" has not be defined")
     Parameters_values=parameters_value_func_call(Parameters_Node,ScopeStack)
     valid_parameter_type(Parameters_requested,Parameters_given,FunctionName)
     evaluate_special_string(Parameters_requested,Parameters_values)
@@ -142,7 +145,10 @@ def method_call(AST,ScopeCount,ScopeStack):
     CallerClassifier=AST.getChildren()[0].getData()
     VarName=get_identifier(AST)
     MethodName=AST.getChildren()[1].getChildren()[0].getData()
-    MethodName=prebuild_method[MethodName]
+    try:
+        MethodName=prebuild_method[MethodName]
+    except:
+        raise Exception("The method "+MethodName+" its not defined")
     AccessList=[]
     if(CallerClassifier=="ACCESS"):
         AccessNode=AST.getChildren()[0]
@@ -467,6 +473,8 @@ def valid_parameter_type(requested_param,given_param, name):
         for j in range(len(given_param[i])):
             focus_type=transform_value(given_param[i][j])
             requested_params=requested_param[i]
+            print(focus_type)
+            print(requested_params)
             if(focus_type=="STRING"):
                 continue
             if('valid_insertion'== requested_params[0] or 'ANY' == requested_params[0]):
@@ -574,9 +582,10 @@ def writeParameters(params,open,close):
 
 def writeAssignment(AST,classifier,ScopeStack):
     assigned=AST.getChildren()[1]
+    assignedClassifier=assigned.getData()
     if(classifier=="MATH"):
         writeMath(assigned)
-    elif(classifier=="lista"):
+    elif(assignedClassifier=="LIST"):
         writeListParams(assigned)
     
     else:
@@ -650,6 +659,8 @@ def writeListParams(listNode):
 
 def listElements(AST):
     elements=[]
+    print("mi nombre es ")
+    print(AST.getData())
     for element in AST.getChildren():
         if(element.getData()=="LIST"):
             elements+=[listElements(element)]
