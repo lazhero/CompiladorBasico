@@ -461,7 +461,6 @@ def valid_parameter_type(requested_param,given_param, name):
                 continue
             if(focus_type=="NO_DEFINED"):
                 continue
-            print(focus_type)
             if(focus_type not in requested_params):
                 raise Exception("The var params types in "+name+"  doesnt match")
 
@@ -598,6 +597,7 @@ def writeMethodCall(MethodName,VarName,ACCESS,Parameters_values):
     GENERATED.write((TABCOUNTER*"\t")+MethodName)
     GENERATED.write("(")
     GENERATED.write(VarName)
+    GENERATED.write(",")
     writeAccess("",ACCESS)
     params=Parameters_values
     writeParameters(params,"",")")
