@@ -654,5 +654,6 @@ def listElements(AST):
         if(element.getData()=="LIST"):
             elements+=[listElements(element)]
         else:
+            print(element.getData())
             elements+=[element.getChildren()[0].getData()]
     return elements

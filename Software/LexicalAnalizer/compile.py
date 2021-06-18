@@ -4,7 +4,7 @@ import subprocess
 import os
 from Lex import lex_syntx 
 from Semantic import SEMANTIC
-sys.tracebacklimit = 0
+#sys.tracebacklimit = 0
 def compile(filename):
     print(filename)
     currentPath=os.path.abspath(__file__)

@@ -135,22 +135,31 @@ class Led_Matrix:
         return led_list
 
 def write_matrix_to_arduino(matrix):
+    part = 0
     row = 0
     data_rec = ""
     while data_rec != "8":
         if data_rec == "8\n":
             break
         try:
-            row = int(data_rec)
+            part = int(data_rec)
         except:
             pass
-        if row == 8:
+        if part == 8:
             break
-        msg = "fill_matrix,"+str(row)+","
-        for i in range(0,8):
-            msg = msg+str(int(matrix[row][i]))
+        msg = "fill_matrix,"+str(part)+","
+        if part == 0:
+            for i in range(0,4):
+                for j in range(0,8):
+                    msg = msg+str(int(matrix[i][j]))
+        else:
+            for i in range(4,8):
+                for j in range(0,8):
+                    msg = msg+str(int(matrix[i][j]))
         serial_port.write(msg.encode('ascii'))
+        serial_port.flush()
         data_rec = serial_port.readline().decode('ascii')
+        
     
 def BLINK(data, time, time_unit, state):
     helper = Led_Matrix()
@@ -174,6 +183,7 @@ def BLINK(data, time, time_unit, state):
         raise Exception("NOT VALID STATE")
     write_matrix_to_arduino(matrix_to_send)
     serial_port.write(msg.encode('ascii'))
+    serial_port.flush()
 
 def DELAY(_time, time_unit):
     if time_unit == "Seg":
@@ -186,7 +196,7 @@ def DELAY(_time, time_unit):
         raise Exception("NOT VALID TIME_UNIT")
 
 def NEG(data):
-    if isinstance(data, bool):
+    if isinstance(data, bool) or isinstance(data, int):
         return not data
     elif isinstance(data, list):
         res = []
@@ -294,24 +304,24 @@ def SHAPE_F(matrix):
 def SHAPE_C(matrix):
     return len(matrix[0])
 
-def T(data):
+def T_METHOD(data):
     if isinstance(data,bool):
         return True
     else:
         for i in range(0,len(data)):
             if isinstance(data[i],list):
-                T(data[i])
+                T_METHOD(data[i])
             else:
                 data[i] = True
         return data
 
-def F(data):
+def F_METHOD(data):
     if isinstance(data,bool):
         return False
     else:
         for i in range(0,len(data)):
             if isinstance(data[i],list):
-                T(data[i])
+                F_METHOD(data[i])
             else:
                 data[i] = False
         return data
@@ -349,6 +359,7 @@ def TEC():
         if res != "":
             break
         serial_port.write(msg.encode('ascii'))
+        serial_port.flush()
         res = serial_port.readline().decode('ascii')
 def HEART():
     msg = "heart"
@@ -357,6 +368,7 @@ def HEART():
         if res != "":
             break
         serial_port.write(msg.encode('ascii'))
+        serial_port.flush()
         res = serial_port.readline().decode('ascii')
 def SMILE():
     msg = "smile"
@@ -365,4 +377,7 @@ def SMILE():
         if res != "":
             break
         serial_port.write(msg.encode('ascii'))
+        serial_port.flush()
         res = serial_port.readline().decode('ascii')
+msg = range(0,8)
+print(msg)
