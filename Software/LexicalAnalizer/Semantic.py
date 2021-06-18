@@ -185,9 +185,9 @@ def assignment(AST,ScopeCount,ScopeStack):
     elif(element_classifier=="IDENTIFIER"):
         assign_type=just_identifier(AST,ScopeStack)
     elif(element_classifier==METHODCALL):
-        assign_type="METHODCALL"
+        assign_type=METHODCALL
     elif(element_classifier==FUNCTIONCALL):
-        assign_type="FUNCTIONCALL"
+        assign_type=FUNCTIONCALL
     elif(element_classifier==ACCESS):
         assign_type="ACCESS"
     else:
@@ -200,10 +200,10 @@ def assignment(AST,ScopeCount,ScopeStack):
     writeType=assign_type
     if(element_classifier in operators):
         writeType="MATH"
-    if(writeType=="METHODCALL"):
+    if(writeType==METHODCALL):
         GENERATED.write((TABCOUNTER*"\t")+varName+"=")
         ScopeCount = method_call(AST.getChildren()[1],ScopeCount,ScopeStack)
-    elif(writeType=="FUNCTIONCALL"):
+    elif(writeType==FUNCTIONCALL):
         GENERATED.write((TABCOUNTER*"\t")+varName+"=")
         ScopeCount = function_call(AST.getChildren()[1],ScopeCount,ScopeStack)
     elif(writeType=="ACCESS"):
@@ -298,14 +298,14 @@ def validate_expression(operands_list,Scope_Stack):
             element_class=just_identifier(operand,Scope_Stack)
             if(element_class=="NOT_DEFINED"):
                 return element_class
-            elif(element_class=="METHODCALL"):
+            elif(element_class==METHODCALL):
                 return element_class
-            elif(element_class=="FUNCTIONCALL"):
+            elif(element_class==FUNCTIONCALL):
                 return element_class
         elif(element_class==FUNCTIONCALL):
-            return "FUNCTIONCALL"
+            return  FUNCTIONCALL
         elif(element_class==METHODCALL):
-            return "METHODCALL"
+            return METHODCALL
         
         expression_type=valid_change(expression_type,element_class)
         if(expression_type==None):
@@ -319,9 +319,9 @@ def valid_change(type1,type2):
         return type1
     if(type1=="NOT_DEFINED" or type2=="NOT_DEFINED"):
         return type1
-    if(type1=="METHODCALL" or type2=="METHODCALL"):
+    if(type1==METHODCALL or type2==METHODCALL):
         return type1
-    if(type1=="FUNCTIONCALL" or type2=="FUNCTIONCALL"):
+    if(type1==FUNCTIONCALL or type2==FUNCTIONCALL):
         return type1
     if(type1==type2):
         return type1
@@ -459,13 +459,16 @@ def valid_parameter_type(requested_param,given_param, name):
                 continue
             if(focus_type=="ACCESS"):
                 continue
+            if(focus_type=="NO_DEFINED"):
+                continue
+            print(focus_type)
             if(focus_type not in requested_params):
                 raise Exception("The var params types in "+name+"  doesnt match")
 
 def valid_caller(varName,MethodName,ScopeStack):
    
     varType=find_var_type(varName,ScopeStack)
-    if(varType!="NOT_DEFINED" and varType!="FUNCTIONCALL" and varType!="METHODCALL"):
+    if(varType!="NOT_DEFINED" and varType!=FUNCTIONCALL and varType!=METHODCALL):
         if(varType not in valid_caller_dic[MethodName]):
             raise Exception("No valid caller "+varName+" to method "+ MethodName)
 

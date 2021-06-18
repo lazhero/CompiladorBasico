@@ -1,7 +1,8 @@
 Procedure main(){
 	matrix = [[True,True,True],[True,False,True],[True,False,False]];
 	matrix.shapeF;
-	var = matrix.Neg;
+	##var = [];
+	var=2;
 	pollo(var);
 }
 
