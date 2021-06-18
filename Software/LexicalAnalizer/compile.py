@@ -27,6 +27,6 @@ def compile_and_run(filename):
     output, error = process.communicate()
     print(output)
     print(error)
-if __name__ == '__main__':
-    globals()[sys.argv[1]](sys.argv[2])
-#compile("/home/lazh/TecnologicoCostaRica/QuintoSemestre/Compi/LedAnimator/LedAnimator/letrero.wage")
+#if __name__ == '__main__':
+#    globals()[sys.argv[1]](sys.argv[2])
+compile("/home/lazh/TecnologicoCostaRica/QuintoSemestre/Compi/LedAnimator/LedAnimator/letrero.wage")

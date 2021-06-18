@@ -1,5 +1,5 @@
 import sys
-sys.path.append(r"d:\Github Repositorios\LedAnimator\Hardware")
+sys.path.append(r"/home/lazh/TecnologicoCostaRica/QuintoSemestre/Compi/LedAnimator/LedAnimator\Hardware")
 from Controller_Serial import *
 def main():
 	A=[[False,False,False,True,True,False,False,False,],[False,False,True,True,True,True,False,False,],[False,True,True,False,False,True,True,False,],[True,True,False,False,False,False,True,True,],[True,True,True,True,True,True,True,True,],[True,True,True,True,True,True,True,True,],[True,True,False,False,False,False,True,True,],[True,True,False,False,False,False,True,True,],]
