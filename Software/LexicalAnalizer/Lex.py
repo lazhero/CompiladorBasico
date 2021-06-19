@@ -47,9 +47,10 @@ t_STRING=r'\"(.)*\"'
 #Some complex regex
 digit            = r'([0-9])'
 nonzerodigit =   r'([1-9])'
+specialchar = r'_'+r'|'+r'\?'+r'|'+r'@'
 nondigit         = r'([_A-Za-z])'
 floatnumber =r'(    '+r'(' +nonzerodigit+ r'\.'+r'(' +digit+r')+'+ r')' + r'|' r'(' + r'(' +digit+r')+'+r'\.'+r'(' +digit+r')+'+r')'  +r')'
-identifier       = r'(' + nondigit + r'(' + digit + r'|' + nondigit + r')*)'
+identifier       = r'(' + nondigit + r'(' + digit + r'|' + nondigit + r'|' + specialchar + r')*)'
 boolean=r'True'+r'|'+r'False'
 multiplication=r'\*'
 division=r'/'
@@ -126,10 +127,10 @@ def p_program_fun(p):
 
 def p_fun_block(p):
     'fun_block : func'
-    p[0]=p[1]
+    p[0]=[p[1]]
 def p_fun_block_recursive(p):
     'fun_block : func fun_block'
-    p[0]=[p[1],p[2]]
+    p[0]=[p[1]]+p[2]
 
 def p_func_custom(p):
     'func : PROCEDURE IDENTIFIER Arguments scope'
@@ -143,7 +144,7 @@ def p_Arguments(p):
     p[0]=['ARGUMENTS']+p[2]
 def p_Arguments_void(p):
     'Arguments : L_PAREN R_PAREN'
-    p[0]=['ARGUMENTS',[]]
+    p[0]=['ARGUMENTS']
 
 def p_args_list(p):
     'args : args COMA final_arg'
@@ -509,7 +510,7 @@ def lex_syntx(filename):
     result = parser.parse(s,lexer=mylexer)
     myTree=None
     if(result!=None):
-        #print(result)
+        print(result)
         myTree = create_tree_from_list(result)
     if(len(Syntax_errors)>0):
         for error in Syntax_errors:

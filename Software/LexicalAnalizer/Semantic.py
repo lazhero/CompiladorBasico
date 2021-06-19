@@ -180,6 +180,8 @@ def method_call(AST,ScopeCount,ScopeStack):
     return ScopeCount
 
 def assignment(AST,ScopeCount,ScopeStack):
+    #print(ScopeStack.stack_to_list())
+    #print(TS)
     element_classifier=AST.getChildren()[1].getData()
     varName=AST.getChildren()[0].getChildren()[0].getData()
     current_type=None
@@ -245,7 +247,7 @@ def FOR_STATEMENT(AST,ScopeCount,ScopeStack):
     if(classifier!="INTEGER"):
          varType=find_var_type(source,ScopeStack)
     if(classifier=="IDENTIFIER" and varType!="lista"):
-        raise Exception("The "+source+" must be a list")
+        raise Exception("The "+source+" must be a list in for statement")
     for_scope = AST.getChildren()[3]
     step=AST.getChildren()[2].getChildren()[0].getChildren()[0].getData()
     GENERATED.write((TABCOUNTER*"\t")+"for ")
@@ -272,7 +274,7 @@ def IF_statement(AST,ScopeCount,ScopeStack):
     else:
         compared_type=transform_value(compared_type)
     if(compared_type!=iterable_type):
-        raise Exception("Cant compare "+compared_type+" with "+iterable_type)
+        raise Exception("Can't compare "+compared_type+" with "+iterable_type+ " in if statement")
     operator=AST.getChildren()[0].getChildren()[0].getChildren()[0].getData()
     GENERATED.write((TABCOUNTER*"\t"))
     GENERATED.write("if("+iterable_name+str(operator)+str(compared_value)+"):\n")
@@ -319,7 +321,7 @@ def validate_expression(operands_list,Scope_Stack):
     for operand in operands_list:
         element_class=operand.getData()
         if(element_class=="IDENTIFIER"):
-            element_class=just_identifier(operand,Scope_Stack)
+            element_class=just_identifier2(operand,Scope_Stack)
             if(element_class=="NOT_DEFINED"):
                 return element_class
             elif(element_class==METHODCALL):
@@ -331,12 +333,37 @@ def validate_expression(operands_list,Scope_Stack):
         elif(element_class==METHODCALL):
             return METHODCALL
         
-        expression_type=valid_change(expression_type,element_class)
+        expression_type=valid_change2(expression_type,element_class)
         if(expression_type==None):
-            raise Exception("Not valid operation between: "+expression_type+ " and "+element_class)
+            raise Exception("Not valid operation between: "+str(expression_type)+ " and "+element_class)
     return expression_type    
         
+def valid_change2(type1,type2):
+    print(type1)
+    print(type2)
+    if(type1==None):
+        return type2
+    if(type2==None):
+        return type1
+    if(type1=="NOT_DEFINED" or type2=="NOT_DEFINED"):
+        return type1
+    if(type1==METHODCALL or type2==METHODCALL):
+        return type1
+    if(type1==FUNCTIONCALL or type2==FUNCTIONCALL):
+        return type1
+    if(type1==type2):
+        return type1
+    if(type1=="INTEGER" and type2=="FLOAT"):
+        return type2
+    if(type2=="INTEGER" and type1=="FLOAT"):
+        return type1
+
+    raise Exception("Not valid operation between: "+str(type1)+ " and "+str(type2))
+
+
 def valid_change(type1,type2):
+    print(type1)
+    print(type2)
     if(type1==None):
         return type2
     if(type2==None):
@@ -361,6 +388,11 @@ def just_identifier(AST,ScopeStack):
     new_type=find_var_type(prevVarName,ScopeStack)
     return new_type
 
+def just_identifier2(AST,Scope_Stack):
+    prevVarName=AST.getChildren()[0].getData()
+    new_type=find_var_type(prevVarName,Scope_Stack)
+    return new_type
+
 def find_var_type(VarName,Scope):
     StackCopy=Scope.copy()
     while(not StackCopy.is_empty()):
@@ -369,7 +401,11 @@ def find_var_type(VarName,Scope):
         except(KeyError):
             StackCopy.pop()
     try: 
-        return TS[('main'),VarName]
+        main = Stack()
+        main.push('main')
+        #print((tuple(main.stack_to_list()),VarName))
+        #print(TS)
+        return TS[(tuple(main.stack_to_list()),VarName)]
     except(KeyError):
         except_string='Variable: '+str(VarName)+" not defined previously"
         raise Exception(except_string)
@@ -386,6 +422,7 @@ def procedure_setting(AST):
         TS[(proc_name)]=parameters
         if (proc_name=="main"):
             main_flag=True
+    
     return main_flag
 
 def parameters_type_func_call(AST,ScopeStack):

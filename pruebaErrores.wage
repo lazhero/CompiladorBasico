@@ -1,0 +1,54 @@
+##Procedure main2(){
+Procedure main(){
+   lis = [True,False,False,False];
+
+   ## LEX test
+   ##~ = 5;
+   ##var? = 1;
+   ##var_2 = True;
+
+   ## SYNTAX TEST
+   x = False;
+   ##y = (3+2;
+   ##y = [True,False,False,False]
+   ##a = [1,2,3,4];
+   ##b = [4.21,45.33,77.25];
+
+   ##for 4 in lis{}
+   ##for i in lis Step True{}
+   ##if x+5{}
+
+   ## SEMANTIC TEST
+   ## x = 0;
+   ##fun();
+   ##fun(True);
+   ##n = m;
+   ##x.shapeF;
+
+   ##for x in lis{}
+   ##for i in x{}
+   ##if x == 5{}
+   ##z = 2+x;
+   ##z = 2+lis;
+   z = lis+x;
+   
+   ##y=0;
+   ##y[0].T;
+   ##notdefined();
+   ##x.notmethod;
+
+
+
+   
+}
+
+Procedure notfun(){
+    m = 2;
+
+}
+
+Procedure fun(int var){
+
+   p = x;
+   PRINT(p);
+}

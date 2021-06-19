@@ -1,4 +1,5 @@
 Procedure main(){
+<<<<<<< Updated upstream
 	matrix = [[True,True,True],[True,False,True],[True,False,False]];
 	matrix.shapeF;
 	var = [];
@@ -29,3 +30,12 @@ Procedure pollo(lista matrix){
 
 
 
+=======
+   milista=[[True,True,True,True],[False,False,False]];
+   milista[0,1][3];
+   milista[:,2];
+   x=list(range(3,True));
+   blink([[True,True,True,True],[False,False,False]],5,"Seg",True);
+}
+
+>>>>>>> Stashed changes

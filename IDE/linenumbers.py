@@ -15,7 +15,7 @@ class ScrollText(tk.Frame):
         tk.Frame.__init__(self, *args, **kwargs)
         self.text = tk.Text(self, bg='#2b2b2b', foreground="#d1dce8", 
                             insertbackground='white',
-                            selectbackground="blue", width=120, height=30)
+                            selectbackground="blue", width=120, height=30, undo=True)
 
         self.scrollbar = tk.Scrollbar(self, orient=tk.VERTICAL, command=self.text.yview)
         self.text.configure(yscrollcommand=self.scrollbar.set)
@@ -35,7 +35,12 @@ class ScrollText(tk.Frame):
         file_menu.add_command(label="Save As", command=lambda: self.save_as_file(False))
         file_menu.add_separator()
         file_menu.add_command(label="Exit", command=root.quit)
-
+        file_menu.add_command(label="Cut", command=lambda: self.cut_text(False), accelerator="Ctrl+X")
+        file_menu.add_command(label="Copy", command=lambda: self.copy_text(False), accelerator="Ctrl+C")
+        file_menu.add_command(label="Paste", command=lambda: self.paste_text(False), accelerator="Ctrl+V")
+        file_menu.add_separator()
+        file_menu.add_command(label="Undo", command=self.text.edit_undo, accelerator="Ctrl+Z")
+        file_menu.add_command(label="Redo", command=self.text.edit_redo, accelerator="Ctrl+Y")
         run_menu = Menu(my_menu, tearoff=False)
         my_menu.add_cascade(label="Run", menu=run_menu)
         run_menu.add_command(label="Compile", command=self.compile_thread)
@@ -45,6 +50,37 @@ class ScrollText(tk.Frame):
         self.text.bind("<Button-1>", self.numberLines.redraw)
         self.scrollbar.bind("<Button-1>", self.onScrollPress)
         self.text.bind("<MouseWheel>", self.onPressDelay)
+
+    def cut_text(self,e):
+        if e:
+            selected = root.clipboard_get()
+
+        else:
+            if self.text.selection_get():
+                selected = self.text.selection_get()
+                self.text.delete("sel.first", "sel.last")
+                root.clipboard_clear()
+                root.clipboard_append(selected)
+
+    def copy_text(self,e):
+        global selected
+        if e:
+            selected = root.clipboard_get()
+
+        if self.text.selection_get():
+            selected = self.text.selection_get()
+            root.clipboard_clear()
+            root.clipboard_append(selected)
+
+    def paste_text(self,e):
+        global selected
+        if e:
+            selected = root.clipboard_get()
+
+        else:
+            if selected:
+                position = self.text.index(INSERT)
+                self.text.insert(position, selected)
 
     def onScrollPress(self, *args):
         self.scrollbar.bind("<B1-Motion>", self.numberLines.redraw)
@@ -95,6 +131,8 @@ class ScrollText(tk.Frame):
         text_file = filedialog.asksaveasfilename(defaultextension=".*", initialdir=self.root_path(), title="Save File", filetypes=(("Wage Files", "*.wage"),("Text Files", "*.txt"), ("Python Files", "*.py"),  ("All Files", "*.*")))
         name = text_file
         if text_file:
+            global open_file_name
+            open_file_name = text_file
             text_file = open(text_file, 'w')
             text_file.write(self.text.get(1.0, END))
             text_file.close()
@@ -155,12 +193,6 @@ class ScrollText(tk.Frame):
         run_thread=Thread(target=self.run)
         run_thread.start()
 
-
-
-'''THIS CODE IS CREDIT OF Bryan Oakley (With minor visual modifications on my side): 
-https://stackoverflow.com/questions/16369470/tkinter-adding-line-number-to-text-widget'''
-
-
 class TextLineNumbers(tk.Canvas):
     def __init__(self, *args, **kwargs):
         tk.Canvas.__init__(self, *args, **kwargs, highlightthickness=0)
@@ -181,8 +213,6 @@ class TextLineNumbers(tk.Canvas):
             self.create_text(2, y, anchor="nw", text=linenum, fill="#606366")
             i = self.textwidget.index("%s+1line" % i)
 
-
-'''END OF Bryan Oakley's CODE'''
 def get_compiler_route():
     init_route=pathlib.Path(__file__).parent.parent
     init_route=init_route /'SoftWare'/ 'LexicalAnalizer'/'compile.py'

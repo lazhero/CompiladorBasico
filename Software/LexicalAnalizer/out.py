@@ -1,4 +1,5 @@
 import sys
+<<<<<<< Updated upstream
 sys.path.append(r"/home/lazh/TecnologicoCostaRica/QuintoSemestre/Compi/LedAnimator/LedAnimator\Hardware")
 from Controller_Serial import *
 def main():
@@ -21,4 +22,14 @@ def pollo(matrix,):
 		
 		hola=2
 		hola=3
+=======
+sys.path.append(r"c:\Users\allva\Desktop\LedAnimator\Hardware")
+from Controller_Serial import *
+def main():
+	milista=[[True,True,True,True,],[False,False,False,],]
+	milista[0][1][3]
+	columnAccess(milista,[2])
+	x=	LIST(RANGE(3,True,),)
+	BLINK([[True,True,True,True,],[False,False,False,],],5,"Seg",True,)
+>>>>>>> Stashed changes
 main()
