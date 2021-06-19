@@ -3,7 +3,7 @@ import subprocess
 import os
 from Lex import lex_syntx 
 from Semantic import SEMANTIC
-#sys.tracebacklimit = 0
+sys.tracebacklimit = 0
 def compile(filename):
     currentPath=os.path.abspath(__file__)
     currentPath=os.path.dirname(currentPath)
@@ -24,7 +24,7 @@ def compile_and_run(filename):
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     output, error = process.communicate()
     return output
-#if __name__ == '__main__':
+if __name__ == '__main__':
  
-#    globals()[sys.argv[1]](sys.argv[2])
-compile("C:/Users/allva/Desktop/LedAnimator/pruebaErrores.wage")
+    globals()[sys.argv[1]](sys.argv[2])
+#compile("C:/Users/allva/Desktop/LedAnimator/pruebaErrores.wage")
